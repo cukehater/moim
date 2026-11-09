@@ -39,7 +39,7 @@ export function CloseReopenButton({ meetingId, isClosed, endsAtPassed, className
 
   if (!isClosed) {
     return (
-      <Button variant="outline" className={className} disabled={pending} onClick={() => run(() => closeMeeting(meetingId), '투표를 마감했어요')}>
+      <Button variant="secondary" className={className} disabled={pending} onClick={() => run(() => closeMeeting(meetingId), '투표를 마감했어요')}>
         조기 마감
       </Button>
     )
@@ -50,7 +50,7 @@ export function CloseReopenButton({ meetingId, isClosed, endsAtPassed, className
   return (
     <>
       <Button
-        variant="outline"
+        variant="secondary"
         className={className}
         disabled={pending}
         onClick={() => (endsAtPassed ? setDialogOpen(true) : reopen())}

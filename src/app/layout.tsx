@@ -28,7 +28,7 @@ export function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ko" className={pretendard.variable}>
       <body>
-        <div className="@container/shell mx-auto min-h-dvh w-full max-w-[640px] bg-background shadow-[0_0_0_1px_var(--border)]">
+        <div className="@container/shell mx-auto min-h-dvh w-full max-w-[500px] bg-background">
           {children}
         </div>
         <Toaster position="top-center" />

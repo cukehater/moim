@@ -41,17 +41,18 @@ export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVo
       toast.error(r.message ?? '투표하지 못했어요')
     })
 
+  const max = Math.max(0, ...options.map((o) => o.count ?? 0))
   const dirty = !myVote || !sameSet(selected, myVote.optionIds) || (!isAnonymous && name !== (myVote.name ?? ''))
 
   return (
     <>
       {!isAnonymous && name && (
-        <div className="mb-3 flex items-center justify-between gap-2 rounded-xl bg-secondary px-4 py-1">
-          <span className="flex items-center gap-2 text-sm">
-            <UserRound className="size-4 text-muted-foreground" aria-hidden />
-            <b className="font-semibold">{name}</b> 이름으로 투표해요
+        <div className="mb-3 flex items-center justify-between gap-2 rounded-2xl bg-gray-50 py-1 pr-1 pl-4">
+          <span className="flex items-center gap-2 text-sub text-gray-700">
+            <UserRound className="size-4 text-gray-500" aria-hidden />
+            <b className="font-bold text-gray-900">{name}</b>님으로 투표해요
           </span>
-          <Button variant="link" size="sm" className="min-h-tap px-1" onClick={() => setNameDialog({})}>
+          <Button variant="ghost" size="sm" className="h-tap text-brand" onClick={() => setNameDialog({})}>
             이름 변경
           </Button>
         </div>
@@ -67,13 +68,14 @@ export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVo
             key={o.id}
             option={o}
             multiple={allowMultiple}
+            max={max}
             selected={selected.includes(o.id)}
             onClick={() => onTap(o.id)}
           />
         ))}
       </div>
 
-      <div className="bottom-bar flex gap-2 border-t bg-background/95 backdrop-blur">
+      <div className="bottom-bar flex gap-2">
         {myVote ? (
           <>
             <CancelVoteButton meetingId={meetingId} onCanceled={() => setSelected([])} />

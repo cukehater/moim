@@ -24,3 +24,9 @@ export function formatRemaining(end: Date, now: Date) {
   if (minutes >= 60) return `${Math.floor(minutes / 60)}시간 남았어요`
   return `${Math.max(minutes, 1)}분 남았어요`
 }
+
+/** 'yyyy-MM-dd' → { label: '12월 20일', weekday: '토', dow: 6 } */
+export function dayParts(day: string) {
+  const d = parseISO(day)
+  return { label: format(d, 'M월 d일'), weekday: format(d, 'EEE', { locale: ko }), dow: d.getDay() }
+}

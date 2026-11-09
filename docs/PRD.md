@@ -58,7 +58,7 @@ getMeetingStatus(m, now):
 - 빈 상태: 첫 모임 만들기 CTA.
 
 ### 2.4 모임 상세 (운영자)
-- 날짜별 결과 표: 득표수 내림차순, 기명이면 이름 목록. 최다 득표 강조.
+- 날짜별 결과 표: 일자순(후보 날짜는 모든 화면에서 항상 일자순), 기명이면 이름 목록. 최다 득표 강조.
 - 액션: 링크 복사, 수정, 조기 마감/재개, 날짜 확정, 삭제.
 - 운영자는 공개 정책과 무관하게 항상 결과를 본다.
 
@@ -169,13 +169,13 @@ src/
 수단: 투표 페이지 RSC 위주(클라이언트 섬은 vote-board·이름 팝오버만), CldImage f_auto/q_auto/sizes + LCP 이미지 priority, react-day-picker는 운영자 폼에만, next/font Pretendard 서브셋, date-fns 개별 import. `'use cache'`는 v1 미사용(집계가 동적).
 
 ### 6.2 레이아웃 (모바일 전용)
-- 앱 셸: `width: 100%; max-width: 640px; margin-inline: auto`. PC에서는 셸 밖 배경만 보이고, 셸 안은 모바일 레이아웃 그대로.
+- 앱 셸: `width: 100%; max-width: 500px; margin-inline: auto`. PC에서는 셸 밖 배경만 보이고, 셸 안은 모바일 레이아웃 그대로.
 - 디자인 기준 폭: **390px** (시안은 390px 프레임, 1rem = 16px 기준으로 작성).
 - 비례 축소: 모든 치수(폰트, 간격, 반경, 아이콘)는 `rem`으로 작성하고, 루트 폰트 크기를 화면 폭에 연동함.
   `html { font-size: min(calc(100vw / 390 * 16), 16px); }`  // = min(4.1026vw, 16px)
   - 390px 이하: 화면 폭에 정비례 축소 (360px 14.8px, 320px 13.1px). 390 시안과 동일한 비율로 보임.
-  - 390~640px: 16px 고정, 레이아웃 폭만 넓어짐(확대하지 않음. 640에서 비례 확대하면 본문 26px로 과대).
-  - 640px 이상: 앱 셸 640px 고정, 가운데 정렬.
+  - 390~500px: 16px 고정, 레이아웃 폭만 넓어짐(확대하지 않음).
+  - 500px 이상: 앱 셸 500px 고정, 가운데 정렬.
 - 레이아웃 분기는 뷰포트 미디어 쿼리 대신 앱 셸 기준 컨테이너 쿼리(`@container`, Tailwind 4 `@container`/`@sm:` 등) 사용.
 - 하단 고정 요소(투표 버튼, FAB, 토스트)도 셸 폭 안에 위치(`position: fixed` + 셸과 같은 max-width/가운데 정렬, 또는 셸 내부 sticky).
 - 고정 하한(rem 축소 영향을 받지 않음): 터치 타깃 `min-height: max(44px, 3rem)`(390px에서 48px, 320px에서도 44px 유지), 인풋 `font-size: max(16px, 1rem)`(iOS 줌 방지).

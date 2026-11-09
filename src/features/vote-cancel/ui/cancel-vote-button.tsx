@@ -29,7 +29,7 @@ export function CancelVoteButton({ meetingId, onCanceled }: { meetingId: string;
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="outline" size="lg" disabled={pending}>
+        <Button variant="secondary" size="lg" className="shrink-0 px-5" disabled={pending}>
           투표 취소
         </Button>
       </AlertDialogTrigger>

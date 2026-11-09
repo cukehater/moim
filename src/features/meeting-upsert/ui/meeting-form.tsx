@@ -81,7 +81,7 @@ export function MeetingForm({ meetingId, defaultValues, hasVotes, renderThumbnai
   }
 
   return (
-    <form onSubmit={handleSubmit(onValid)} noValidate className="flex flex-col gap-6 px-4 pt-4 pb-28">
+    <form onSubmit={handleSubmit(onValid)} noValidate className="flex flex-col gap-7 px-5 pt-2 pb-36">
       <section className="flex flex-col gap-2">
         <Label>썸네일</Label>
         <Controller control={control} name="thumbnailId" render={({ field }) => <>{renderThumbnail(field)}</>} />
@@ -106,19 +106,19 @@ export function MeetingForm({ meetingId, defaultValues, hasVotes, renderThumbnai
         render={({ field, fieldState }) => (
           <section className="flex flex-col gap-2">
             <Label>
-              후보 날짜 <span className="text-primary">*</span>
+              후보 날짜 <span className="text-brand">*</span>
             </Label>
-            <div className="rounded-xl border">
+            <div className="rounded-2xl border border-gray-200 px-1 py-2">
               <Calendar
                 mode="multiple"
                 locale={ko}
                 selected={field.value.map((d) => parseISO(d))}
                 onSelect={(days) => field.onChange((days ?? []).map((d) => format(d, 'yyyy-MM-dd')).sort())}
-                className="mx-auto [--cell-size:2.75rem]"
+                className="mx-auto w-full bg-transparent [--cell-size:2.75rem]"
               />
             </div>
             {field.value.length > 0 && (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sub text-gray-600">
                 {field.value.length}개 · {field.value.map(formatDay).join(', ')}
               </p>
             )}
@@ -136,7 +136,7 @@ export function MeetingForm({ meetingId, defaultValues, hasVotes, renderThumbnai
         </Field>
       </div>
 
-      <section className="flex flex-col divide-y rounded-xl border">
+      <section className="flex flex-col divide-y divide-gray-100 rounded-2xl border border-gray-200">
         <Controller
           control={control}
           name="isAnonymous"
@@ -158,10 +158,10 @@ export function MeetingForm({ meetingId, defaultValues, hasVotes, renderThumbnai
         name="resultVisibility"
         render={({ field }) => (
           <fieldset className="flex flex-col gap-2">
-            <legend className="mb-2 text-sm font-medium">결과 공개</legend>
-            <RadioGroup value={field.value} onValueChange={field.onChange} className="gap-0 rounded-xl border">
+            <legend className="mb-2 text-sub font-semibold text-gray-700">결과 공개</legend>
+            <RadioGroup value={field.value} onValueChange={field.onChange} className="gap-0 divide-y divide-gray-100 rounded-2xl border border-gray-200">
               {VISIBILITY.map((v) => (
-                <Label key={v.value} className="flex min-h-tap items-center gap-3 px-4 font-normal not-last:border-b">
+                <Label key={v.value} className="flex min-h-cta items-center gap-3 px-4 text-body font-medium text-gray-900">
                   <RadioGroupItem value={v.value} />
                   {v.label}
                 </Label>
@@ -171,7 +171,7 @@ export function MeetingForm({ meetingId, defaultValues, hasVotes, renderThumbnai
         )}
       />
 
-      <div className="bottom-bar bg-background/95 border-t backdrop-blur">
+      <div className="bottom-bar">
         <Button type="submit" size="lg" className="w-full" disabled={pending}>
           {pending ? '저장 중…' : meetingId ? '수정하기' : '모임 만들기'}
         </Button>
@@ -206,7 +206,7 @@ function Field(props: { label: string; htmlFor: string; required?: boolean; erro
     <div className="flex flex-col gap-2">
       <Label htmlFor={props.htmlFor}>
         {props.label}
-        {props.required && <span className="text-primary">*</span>}
+        {props.required && <span className="text-brand">*</span>}
       </Label>
       {props.children}
       <FieldError message={props.error} />
@@ -216,10 +216,10 @@ function Field(props: { label: string; htmlFor: string; required?: boolean; erro
 
 function ToggleRow(props: { id: string; label: string; hint: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
-    <div className="flex min-h-tap items-center justify-between gap-3 px-4 py-3">
-      <Label htmlFor={props.id} className="flex flex-col items-start gap-0.5">
+    <div className="flex min-h-cta items-center justify-between gap-3 px-4 py-3.5">
+      <Label htmlFor={props.id} className="flex flex-col items-start gap-1 text-body text-gray-900">
         <span>{props.label}</span>
-        <span className="text-xs font-normal text-muted-foreground">{props.hint}</span>
+        <span className="text-caption font-normal text-gray-500">{props.hint}</span>
       </Label>
       <Switch id={props.id} checked={props.checked} onCheckedChange={props.onChange} />
     </div>

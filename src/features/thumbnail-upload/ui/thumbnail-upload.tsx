@@ -11,8 +11,8 @@ type Props = { value: string | null; onChange: (publicId: string | null) => void
 export function ThumbnailUpload({ value, onChange }: Props) {
   return (
     <div className="flex flex-col gap-2">
-      <div className="overflow-hidden rounded-xl border">
-        <Thumbnail publicId={value} alt="썸네일 미리보기" sizes="(max-width: 640px) 100vw, 640px" />
+      <div className="overflow-hidden rounded-2xl">
+        <Thumbnail publicId={value} alt="썸네일 미리보기" sizes="(max-width: 500px) 100vw, 500px" />
       </div>
       <div className="flex gap-2">
         <CldUploadWidget
@@ -37,7 +37,7 @@ export function ThumbnailUpload({ value, onChange }: Props) {
           }}
         >
           {({ open, isLoading }) => (
-            <Button type="button" variant="outline" className="flex-1" disabled={isLoading} onClick={() => open()}>
+            <Button type="button" variant="secondary" className="flex-1" disabled={isLoading} onClick={() => open()}>
               <ImagePlus aria-hidden />
               {value ? '썸네일 바꾸기' : '썸네일 올리기'}
             </Button>

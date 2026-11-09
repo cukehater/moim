@@ -14,7 +14,7 @@ export function CopyLinkButton({ path, className }: { path: string; className?: 
     }
   }
   return (
-    <Button type="button" variant="outline" onClick={copy} className={className}>
+    <Button type="button" variant="secondary" onClick={copy} className={className}>
       <Link2 aria-hidden />
       링크 복사
     </Button>

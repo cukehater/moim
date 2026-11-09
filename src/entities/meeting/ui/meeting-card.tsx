@@ -13,21 +13,21 @@ type Props = {
 
 export function MeetingCard({ meeting, status, responseCount }: Props) {
   return (
-    <Link
-      href={`/dashboard/${meeting.id}`}
-      className="group block overflow-hidden rounded-2xl border bg-card outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
-    >
-      <Thumbnail publicId={meeting.thumbnailId} alt="" sizes="(max-width: 640px) 100vw, 320px" />
-      <div className="flex flex-col gap-1.5 p-4">
-        <div className="flex items-center justify-between gap-2">
+    <Link href={`/dashboard/${meeting.id}`} className="pressable block rounded-2xl">
+      <Thumbnail
+        publicId={meeting.thumbnailId}
+        alt=""
+        sizes="(max-width: 500px) 100vw, 250px"
+        className="rounded-2xl"
+      />
+      <div className="flex flex-col gap-1 px-1 pt-3">
+        <div className="flex items-center gap-2">
           <StatusBadge status={status} />
-          <span className="text-xs text-muted-foreground">응답 {responseCount}명</span>
+          <span className="text-caption text-gray-500 tabular">응답 {responseCount}명</span>
         </div>
-        <h2 className="truncate text-base font-semibold">{meeting.title}</h2>
-        {meeting.description && (
-          <p className="line-clamp-2 text-sm text-muted-foreground">{meeting.description}</p>
-        )}
-        <p className="text-xs text-muted-foreground tabular-nums">
+        <h2 className="truncate text-body font-bold">{meeting.title}</h2>
+        {meeting.description && <p className="line-clamp-2 text-sub text-gray-600">{meeting.description}</p>}
+        <p className="text-caption text-gray-500 tabular">
           {formatDateTime(meeting.startsAt)} ~ {formatDateTime(meeting.endsAt)}
         </p>
       </div>
