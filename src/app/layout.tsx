@@ -12,9 +12,14 @@ const pretendard = localFont({
   display: 'swap',
 })
 
+const DESCRIPTION = '참석 여부, 한 번에 모아요'
+
+// 아이콘·OG 이미지는 app/ 파일 규칙(icon.svg, apple-icon.png, opengraph-image.png 등)으로 자동 등록
 export const metadata: Metadata = {
   title: 'MOIM',
-  description: '언제 시간 되세요? 링크 하나로 모임 날짜를 정해요.',
+  description: DESCRIPTION,
+  openGraph: { title: 'MOIM', description: DESCRIPTION, siteName: 'MOIM', locale: 'ko_KR', type: 'website' },
+  twitter: { card: 'summary_large_image', title: 'MOIM', description: DESCRIPTION },
 }
 
 export const viewport: Viewport = {
@@ -28,7 +33,7 @@ export function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ko" className={pretendard.variable}>
       <body>
-        <div className="@container/shell mx-auto min-h-dvh w-full max-w-[500px] bg-background">
+        <div className="@container/shell mx-auto min-h-dvh w-full max-w-[500px] bg-white">
           {children}
         </div>
         <Toaster position="top-center" />

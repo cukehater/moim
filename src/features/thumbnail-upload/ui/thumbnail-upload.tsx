@@ -11,7 +11,7 @@ type Props = { value: string | null; onChange: (publicId: string | null) => void
 export function ThumbnailUpload({ value, onChange }: Props) {
   return (
     <div className="flex flex-col gap-2">
-      <div className="overflow-hidden rounded-2xl">
+      <div className="overflow-hidden rounded-lg">
         <Thumbnail publicId={value} alt="썸네일 미리보기" sizes="(max-width: 500px) 100vw, 500px" />
       </div>
       <div className="flex gap-2">

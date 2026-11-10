@@ -40,7 +40,7 @@ export function CancelVoteButton({ meetingId, onCanceled }: { meetingId: string;
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>아니요</AlertDialogCancel>
-          <AlertDialogAction onClick={cancel}>투표 취소</AlertDialogAction>
+          <AlertDialogAction className="text-destructive" onClick={cancel}>투표 취소</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

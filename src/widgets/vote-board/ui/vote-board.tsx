@@ -1,6 +1,5 @@
 'use client'
 
-import { UserRound } from 'lucide-react'
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { CancelVoteButton } from '@/features/vote-cancel'
@@ -41,23 +40,10 @@ export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVo
       toast.error(r.message ?? '투표하지 못했어요')
     })
 
-  const max = Math.max(0, ...options.map((o) => o.count ?? 0))
   const dirty = !myVote || !sameSet(selected, myVote.optionIds) || (!isAnonymous && name !== (myVote.name ?? ''))
 
   return (
     <>
-      {!isAnonymous && name && (
-        <div className="mb-3 flex items-center justify-between gap-2 rounded-2xl bg-gray-50 py-1 pr-1 pl-4">
-          <span className="flex items-center gap-2 text-sub text-gray-700">
-            <UserRound className="size-4 text-gray-500" aria-hidden />
-            <b className="font-bold text-gray-900">{name}</b>님으로 투표해요
-          </span>
-          <Button variant="ghost" size="sm" className="h-tap text-brand" onClick={() => setNameDialog({})}>
-            이름 변경
-          </Button>
-        </div>
-      )}
-
       <div
         role={allowMultiple ? 'group' : 'radiogroup'}
         aria-label={allowMultiple ? '참석 가능한 날짜 (여러 개 선택 가능)' : '참석 가능한 날짜 (하나만 선택)'}
@@ -68,12 +54,20 @@ export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVo
             key={o.id}
             option={o}
             multiple={allowMultiple}
-            max={max}
             selected={selected.includes(o.id)}
             onClick={() => onTap(o.id)}
           />
         ))}
       </div>
+
+      {!isAnonymous && name && (
+        <p className="mt-3 text-caption text-gray-600">
+          <b className="font-semibold text-gray-700">{name}</b>님으로 투표해요 ·{' '}
+          <button type="button" onClick={() => setNameDialog({})} className="py-2 font-semibold text-brand underline-offset-2 hover:underline">
+            이름 변경
+          </button>
+        </p>
+      )}
 
       <div className="bottom-bar flex gap-2">
         {myVote ? (
@@ -85,7 +79,7 @@ export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVo
           </>
         ) : (
           <Button size="lg" className="w-full" disabled={pending || selected.length === 0} onClick={submit}>
-            {pending ? '투표 중…' : selected.length ? `${selected.length}개 날짜로 투표하기` : '투표하기'}
+            {pending ? '투표 중…' : '투표하기'}
           </Button>
         )}
       </div>

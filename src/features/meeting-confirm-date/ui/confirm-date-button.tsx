@@ -16,7 +16,7 @@ export function ConfirmDateButton({ meetingId, optionId, isConfirmed }: Props) {
       else toast.error(r.message)
     })
   return (
-    <Button size="sm" variant={isConfirmed ? 'secondary' : 'tonal'} disabled={pending} onClick={run} className="h-tap px-4">
+    <Button size="sm" variant={isConfirmed ? 'ghost' : 'secondary'} disabled={pending} onClick={run} className="h-tap px-3">
       {isConfirmed ? '확정 취소' : '이 날짜로 확정'}
     </Button>
   )

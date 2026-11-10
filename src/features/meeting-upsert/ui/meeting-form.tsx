@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { format } from 'date-fns/format'
 import { parseISO } from 'date-fns/parseISO'
 import { ko } from 'date-fns/locale/ko'
+import { Check } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { type ReactNode, useState, useTransition } from 'react'
 import { Controller, type Path, useForm } from 'react-hook-form'
@@ -25,7 +26,6 @@ import { Calendar } from '@/shared/ui/calendar'
 import { FieldError } from '@/shared/ui/field-error'
 import { Input } from '@/shared/ui/input'
 import { Label } from '@/shared/ui/label'
-import { RadioGroup, RadioGroupItem } from '@/shared/ui/radio-group'
 import { Switch } from '@/shared/ui/switch'
 import { Textarea } from '@/shared/ui/textarea'
 import { upsertMeeting } from '../api/upsert-meeting.action'
@@ -81,93 +81,98 @@ export function MeetingForm({ meetingId, defaultValues, hasVotes, renderThumbnai
   }
 
   return (
-    <form onSubmit={handleSubmit(onValid)} noValidate className="flex flex-col gap-7 px-5 pt-2 pb-36">
-      <section className="flex flex-col gap-2">
-        <Label>썸네일</Label>
+    <form onSubmit={handleSubmit(onValid)} noValidate className="flex flex-col gap-7 px-5 pt-4 pb-32">
+      <section>
         <Controller control={control} name="thumbnailId" render={({ field }) => <>{renderThumbnail(field)}</>} />
       </section>
 
-      <Field label="제목" htmlFor="title" required error={err('title')}>
-        <Input id="title" maxLength={80} aria-invalid={!!err('title')} {...register('title')} />
-      </Field>
-      <Field label="모임장" htmlFor="host" required error={err('host')}>
-        <Input id="host" maxLength={30} aria-invalid={!!err('host')} {...register('host')} />
-      </Field>
-      <Field label="장소" htmlFor="location" error={err('location')}>
-        <Input id="location" maxLength={100} {...register('location')} />
-      </Field>
-      <Field label="설명" htmlFor="description" error={err('description')}>
-        <Textarea id="description" maxLength={500} rows={3} {...register('description')} />
-      </Field>
+      <Group label="기본 정보" errors={[err('title'), err('host'), err('location'), err('description')]}>
+        {/* 그룹 구분선은 ::before로 그리므로 input은 div로 감쌈 */}
+        <div>
+          <Input aria-label="제목" placeholder="제목 (필수)" maxLength={80} aria-invalid={!!err('title')} {...register('title')} />
+        </div>
+        <div>
+          <Input aria-label="모임장" placeholder="모임장 (필수)" maxLength={30} aria-invalid={!!err('host')} {...register('host')} />
+        </div>
+        <div>
+          <Input aria-label="장소" placeholder="장소" maxLength={100} {...register('location')} />
+        </div>
+        <div>
+          <Textarea aria-label="설명" placeholder="설명" maxLength={500} rows={3} {...register('description')} />
+        </div>
+      </Group>
 
       <Controller
         control={control}
         name="dates"
         render={({ field, fieldState }) => (
-          <section className="flex flex-col gap-2">
-            <Label>
-              후보 날짜 <span className="text-brand">*</span>
-            </Label>
-            <div className="rounded-2xl border border-gray-200 px-1 py-2">
+          <Group
+            label="후보 날짜"
+            footer={field.value.length > 0 ? `${field.value.length}개 · ${field.value.map(formatDay).join(', ')}` : '달력에서 날짜를 눌러 고르세요.'}
+            errors={[fieldState.error?.message ?? fieldState.error?.root?.message]}
+          >
+            <div className="px-2 py-2">
               <Calendar
                 mode="multiple"
                 locale={ko}
                 selected={field.value.map((d) => parseISO(d))}
                 onSelect={(days) => field.onChange((days ?? []).map((d) => format(d, 'yyyy-MM-dd')).sort())}
-                className="mx-auto w-full bg-transparent [--cell-size:2.75rem]"
+                className="mx-auto w-full bg-transparent p-1 [--cell-size:2.75rem]"
               />
             </div>
-            {field.value.length > 0 && (
-              <p className="text-sub text-gray-600">
-                {field.value.length}개 · {field.value.map(formatDay).join(', ')}
-              </p>
-            )}
-            <FieldError message={fieldState.error?.message ?? fieldState.error?.root?.message} />
-          </section>
+          </Group>
         )}
       />
 
-      <div className="grid grid-cols-2 gap-3">
-        <Field label="투표 시작" htmlFor="startsAt" error={err('startsAt')}>
-          <Input id="startsAt" type="datetime-local" {...register('startsAt')} />
-        </Field>
-        <Field label="투표 종료" htmlFor="endsAt" error={err('endsAt')}>
-          <Input id="endsAt" type="datetime-local" aria-invalid={!!err('endsAt')} {...register('endsAt')} />
-        </Field>
-      </div>
+      <Group label="투표 기간" errors={[err('startsAt'), err('endsAt')]}>
+        <Row label="시작" htmlFor="startsAt">
+          <Input id="startsAt" type="datetime-local" className={DATE_INPUT} {...register('startsAt')} />
+        </Row>
+        <Row label="종료" htmlFor="endsAt">
+          <Input id="endsAt" type="datetime-local" className={DATE_INPUT} aria-invalid={!!err('endsAt')} {...register('endsAt')} />
+        </Row>
+      </Group>
 
-      <section className="flex flex-col divide-y divide-gray-100 rounded-2xl border border-gray-200">
+      <Group label="투표 방식" footer="익명이면 이름을 묻지 않아요. 여러 날짜를 끄면 하루만 고를 수 있어요.">
         <Controller
           control={control}
           name="isAnonymous"
           render={({ field }) => (
-            <ToggleRow id="isAnonymous" label="익명 투표" hint="투표자 이름을 받지 않아요" checked={field.value} onChange={field.onChange} />
+            <Row label="익명 투표" htmlFor="isAnonymous">
+              <Switch id="isAnonymous" checked={field.value} onCheckedChange={field.onChange} />
+            </Row>
           )}
         />
         <Controller
           control={control}
           name="allowMultiple"
           render={({ field }) => (
-            <ToggleRow id="allowMultiple" label="여러 날짜 선택 허용" hint="끄면 날짜를 하나만 고를 수 있어요" checked={field.value} onChange={field.onChange} />
+            <Row label="여러 날짜 선택" htmlFor="allowMultiple">
+              <Switch id="allowMultiple" checked={field.value} onCheckedChange={field.onChange} />
+            </Row>
           )}
         />
-      </section>
+      </Group>
 
       <Controller
         control={control}
         name="resultVisibility"
         render={({ field }) => (
-          <fieldset className="flex flex-col gap-2">
-            <legend className="mb-2 text-sub font-semibold text-gray-700">결과 공개</legend>
-            <RadioGroup value={field.value} onValueChange={field.onChange} className="gap-0 divide-y divide-gray-100 rounded-2xl border border-gray-200">
-              {VISIBILITY.map((v) => (
-                <Label key={v.value} className="flex min-h-cta items-center gap-3 px-4 text-body font-medium text-gray-900">
-                  <RadioGroupItem value={v.value} />
-                  {v.label}
-                </Label>
-              ))}
-            </RadioGroup>
-          </fieldset>
+          <Group label="결과 공개">
+            {VISIBILITY.map((v) => (
+              <button
+                key={v.value}
+                type="button"
+                role="radio"
+                aria-checked={field.value === v.value}
+                onClick={() => field.onChange(v.value)}
+                className="flex min-h-tap w-full items-center px-4 text-left text-body active:bg-gray-200"
+              >
+                <span className="flex-1">{v.label}</span>
+                {field.value === v.value && <Check className="size-5 text-brand" strokeWidth={2.5} aria-hidden />}
+              </button>
+            ))}
+          </Group>
         )}
       />
 
@@ -201,27 +206,32 @@ export function MeetingForm({ meetingId, defaultValues, hasVotes, renderThumbnai
   )
 }
 
-function Field(props: { label: string; htmlFor: string; required?: boolean; error?: string; children: ReactNode }) {
+const DATE_INPUT = 'h-9 w-auto rounded-md bg-gray-100 px-2.5 text-right'
+
+/** iOS 그룹: 머리말 + 흰 묶음 + 꼬리말/에러 */
+function Group(props: { label: string; footer?: string; errors?: (string | undefined)[]; children: ReactNode }) {
+  const errors = props.errors?.filter(Boolean) ?? []
   return (
-    <div className="flex flex-col gap-2">
-      <Label htmlFor={props.htmlFor}>
-        {props.label}
-        {props.required && <span className="text-brand">*</span>}
-      </Label>
-      {props.children}
-      <FieldError message={props.error} />
-    </div>
+    <section>
+      <h2 className="section-label">{props.label}</h2>
+      <div className="grouped">{props.children}</div>
+      {props.footer && <p className="px-4 pt-1.5 text-caption text-gray-500">{props.footer}</p>}
+      {errors.map((e) => (
+        <div key={e} className="px-4 pt-1.5">
+          <FieldError message={e} />
+        </div>
+      ))}
+    </section>
   )
 }
 
-function ToggleRow(props: { id: string; label: string; hint: string; checked: boolean; onChange: (v: boolean) => void }) {
+function Row(props: { label: string; htmlFor: string; children: ReactNode }) {
   return (
-    <div className="flex min-h-cta items-center justify-between gap-3 px-4 py-3.5">
-      <Label htmlFor={props.id} className="flex flex-col items-start gap-1 text-body text-gray-900">
-        <span>{props.label}</span>
-        <span className="text-caption font-normal text-gray-500">{props.hint}</span>
+    <div className="flex min-h-tap items-center justify-between gap-3 py-1.5 pr-3 pl-4">
+      <Label htmlFor={props.htmlFor} className="text-body font-normal text-gray-900">
+        {props.label}
       </Label>
-      <Switch id={props.id} checked={props.checked} onCheckedChange={props.onChange} />
+      {props.children}
     </div>
   )
 }

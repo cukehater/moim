@@ -55,6 +55,7 @@ function NameForm({ defaultName, serverError, onConfirm }: Omit<Props, 'open' | 
       <div className="flex flex-col gap-2">
         <Input
           autoFocus
+          className="bg-gray-100"
           aria-label="이름"
           aria-invalid={!!error}
           aria-describedby={error ? 'voter-name-error' : undefined}

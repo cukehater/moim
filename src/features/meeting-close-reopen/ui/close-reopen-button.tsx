@@ -74,6 +74,7 @@ export function CloseReopenButton({ meetingId, isClosed, endsAtPassed, className
             <Input
               id="reopen-ends-at"
               type="datetime-local"
+              className="bg-gray-100"
               required
               value={endsAt}
               aria-invalid={!!error}

@@ -9,10 +9,11 @@ export type DateOption = typeof dateOptions.$inferSelect
 
 export async function getMeetings() {
   return db
-    .select({ ...getTableColumns(meetings), responseCount: count(votes.id) })
+    .select({ ...getTableColumns(meetings), responseCount: count(votes.id), confirmedDate: dateOptions.date })
     .from(meetings)
     .leftJoin(votes, eq(votes.meetingId, meetings.id))
-    .groupBy(meetings.id)
+    .leftJoin(dateOptions, eq(dateOptions.id, meetings.confirmedOptionId))
+    .groupBy(meetings.id, dateOptions.date)
     .orderBy(desc(meetings.createdAt))
 }
 

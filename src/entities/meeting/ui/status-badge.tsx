@@ -9,17 +9,18 @@ const LABEL: Record<DisplayStatus, string> = {
 }
 
 const STYLE: Record<DisplayStatus, string> = {
-  scheduled: 'bg-brand-50 text-brand',
-  open: 'bg-positive-50 text-positive',
+  scheduled: 'bg-gray-100 text-gray-800',
+  open: 'bg-brand text-white',
   closed: 'bg-gray-100 text-gray-600',
-  confirmed: 'bg-brand text-white',
+  confirmed: 'bg-brand-50 text-brand-600',
 }
 
+/** 당근식 작은 태그: 색면 + 글자 */
 export function StatusBadge({ status, className }: { status: DisplayStatus; className?: string }) {
   return (
     <span
       className={cn(
-        'inline-flex h-6 shrink-0 items-center rounded-md px-2 text-caption font-semibold',
+        'inline-flex h-[1.375rem] shrink-0 items-center rounded-sm px-1.5 text-caption font-bold',
         STYLE[status],
         className,
       )}

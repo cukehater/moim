@@ -1,6 +1,5 @@
 'use client'
 
-import { Trash2 } from 'lucide-react'
 import { useTransition } from 'react'
 import {
   AlertDialog,
@@ -21,9 +20,8 @@ export function DeleteMeetingButton({ meetingId }: { meetingId: string }) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="ghost" className="text-destructive hover:text-destructive" disabled={pending}>
-          <Trash2 aria-hidden />
-          삭제
+        <Button variant="secondary" size="lg" className="w-full text-destructive" disabled={pending}>
+          모임 삭제
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
@@ -34,7 +32,7 @@ export function DeleteMeetingButton({ meetingId }: { meetingId: string }) {
         <AlertDialogFooter>
           <AlertDialogCancel>취소</AlertDialogCancel>
           <AlertDialogAction
-            className="bg-destructive text-white hover:bg-destructive/90"
+            className="text-destructive"
             onClick={() => startTransition(() => deleteMeeting(meetingId))}
           >
             삭제

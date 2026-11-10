@@ -1,4 +1,3 @@
-import { Pencil } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
@@ -43,64 +42,62 @@ async function MeetingDetail({ params }: Pick<PageProps<'/dashboard/[id]'>, 'par
         title={meeting.title}
         backHref="/dashboard"
         action={
-          <Button asChild variant="ghost" size="icon" aria-label="수정">
-            <Link href={`/dashboard/${id}/edit`}>
-              <Pencil aria-hidden />
-            </Link>
+          <Button asChild variant="ghost" className="h-tap px-3">
+            <Link href={`/dashboard/${id}/edit`}>편집</Link>
           </Button>
         }
       />
-      <main className="pb-12">
-        <Thumbnail publicId={meeting.thumbnailId} alt="" sizes="(max-width: 500px) 100vw, 500px" priority />
-
-        <section className="flex flex-col gap-4 px-5 pt-5 pb-6">
-          <div className="flex items-center gap-2">
+      <main className="flex flex-col gap-7 px-5 pt-4 pb-16">
+        <div>
+          {meeting.thumbnailId && (
+            <Thumbnail
+              publicId={meeting.thumbnailId}
+              alt=""
+              sizes="(max-width: 500px) 100vw, 500px"
+              priority
+              className="-mx-5 -mt-4 mb-4 w-auto"
+            />
+          )}
+          <div>
             <StatusBadge status={getDisplayStatus(meeting, now)} />
-            <span className="text-sub text-gray-500 tabular">응답 {voterCount}명</span>
+            <h2 className="mt-2 text-title font-bold text-balance">{meeting.title}</h2>
+            {meeting.description && (
+              <p className="mt-2 text-body whitespace-pre-line text-gray-800">{meeting.description}</p>
+            )}
           </div>
-          {confirmedParts && (
-            <p className="flex items-center justify-between rounded-2xl bg-brand-50 px-4 py-3.5">
-              <span className="text-sub font-semibold text-brand">최종 날짜</span>
-              <span className="text-body font-bold text-brand tabular">
+        </div>
+
+        {confirmedParts && (
+          <div className="grouped">
+            <div className="flex min-h-tap items-center px-4">
+              <span className="flex-1 text-body">최종 날짜</span>
+              <span className="text-body font-semibold text-brand">
                 {confirmedParts.label} {confirmedParts.weekday}요일
               </span>
-            </p>
-          )}
-          <dl className="grid grid-cols-[4.5rem_1fr] gap-x-3 gap-y-2.5 text-sub">
-            <dt className="text-gray-500">모임장</dt>
-            <dd className="text-gray-900">{meeting.host}</dd>
-            {meeting.location && (
-              <>
-                <dt className="text-gray-500">장소</dt>
-                <dd className="text-gray-900">{meeting.location}</dd>
-              </>
-            )}
-            <dt className="text-gray-500">기간</dt>
-            <dd className="text-gray-900 tabular">
-              {formatDateTime(meeting.startsAt)} ~ {formatDateTime(meeting.endsAt)}
-            </dd>
-            <dt className="text-gray-500">방식</dt>
-            <dd className="text-gray-900">
-              {meeting.isAnonymous ? '익명' : '기명'} · {meeting.allowMultiple ? '여러 날짜' : '한 날짜'} ·{' '}
-              {VISIBILITY_LABEL[meeting.resultVisibility]}
-            </dd>
-          </dl>
-          {meeting.description && <p className="text-body whitespace-pre-line text-gray-700">{meeting.description}</p>}
-          <div className="mt-1 grid grid-cols-2 gap-2">
-            <CopyLinkButton path={`/m/${id}`} />
-            <CloseReopenButton meetingId={id} isClosed={status === 'closed'} endsAtPassed={meeting.endsAt <= now} />
+            </div>
           </div>
+        )}
+
+        <section>
+          <h3 className="section-label">정보</h3>
+          <dl className="grouped">
+            <InfoRow label="모임장" value={meeting.host} />
+            {meeting.location && <InfoRow label="장소" value={meeting.location} />}
+            <InfoRow label="시작" value={formatDateTime(meeting.startsAt)} />
+            <InfoRow label="종료" value={formatDateTime(meeting.endsAt)} />
+            <InfoRow label="이름" value={meeting.isAnonymous ? '익명' : '기명'} />
+            <InfoRow label="선택" value={meeting.allowMultiple ? '여러 날짜' : '한 날짜'} />
+            <InfoRow label="결과 공개" value={VISIBILITY_LABEL[meeting.resultVisibility]} />
+          </dl>
         </section>
 
-        <div className="h-3 bg-gray-100" />
+        <div className="grid grid-cols-2 gap-2">
+          <CopyLinkButton path={`/m/${id}`} />
+          <CloseReopenButton meetingId={id} isClosed={status === 'closed'} endsAtPassed={meeting.endsAt <= now} />
+        </div>
 
-        <section className="flex flex-col gap-4 px-5 pt-6">
-          <div>
-            <h2 className="text-heading font-bold">날짜별 결과</h2>
-            {status === 'closed' && !confirmed && (
-              <p className="text-sub text-gray-500">마감됐어요. 최종 날짜를 확정해 주세요.</p>
-            )}
-          </div>
+        <section>
+          <h3 className="section-label">날짜별 결과 · 응답 {voterCount}명</h3>
           <MeetingResultTable
             meetingId={id}
             options={meeting.options}
@@ -109,12 +106,22 @@ async function MeetingDetail({ params }: Pick<PageProps<'/dashboard/[id]'>, 'par
             canConfirm={status === 'closed'}
             confirmedOptionId={meeting.confirmedOptionId}
           />
+          {status === 'closed' && !confirmed && (
+            <p className="px-4 pt-2 text-caption text-gray-500">마감됐어요. 최종 날짜를 확정해 주세요.</p>
+          )}
         </section>
 
-        <div className="mt-8 flex justify-center px-5">
-          <DeleteMeetingButton meetingId={id} />
-        </div>
+        <DeleteMeetingButton meetingId={id} />
       </main>
     </>
+  )
+}
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex min-h-tap items-center gap-4 px-4 py-2.5">
+      <dt className="text-body">{label}</dt>
+      <dd className="ml-auto text-right text-body text-gray-500 tabular">{value}</dd>
+    </div>
   )
 }
