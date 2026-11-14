@@ -13,11 +13,12 @@ export async function upsertMeeting(id: string | null, input: MeetingInput): Pro
   const parsed = meetingInputSchema.safeParse(input)
   if (!parsed.success) return { ok: false, fieldErrors: z.flattenError(parsed.error).fieldErrors }
 
-  const { dates, startsAt, endsAt, description, location, ...rest } = parsed.data
+  const { dates, startsAt, endsAt, description, location, mapUrl, ...rest } = parsed.data
   const values = {
     ...rest,
     description: description || null,
     location: location || null,
+    mapUrl: mapUrl || null,
     startsAt: fromKstInput(startsAt),
     endsAt: fromKstInput(endsAt),
   }

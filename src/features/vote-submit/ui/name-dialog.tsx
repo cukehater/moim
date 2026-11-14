@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { Button } from '@/shared/ui/button'
 import {
   Dialog,
@@ -18,7 +18,8 @@ type Props = {
   onOpenChange: (open: boolean) => void
   defaultName: string
   serverError?: string
-  onConfirm: (name: string) => void
+  /** 에러 문구를 돌려주면 창을 닫지 않고 표시 */
+  onConfirm: (name: string) => void | Promise<string | undefined>
 }
 
 export function NameDialog({ open, onOpenChange, defaultName, serverError, onConfirm }: Props) {
@@ -35,6 +36,7 @@ export function NameDialog({ open, onOpenChange, defaultName, serverError, onCon
 function NameForm({ defaultName, serverError, onConfirm }: Omit<Props, 'open' | 'onOpenChange'>) {
   const [name, setName] = useState(defaultName)
   const [error, setError] = useState(serverError)
+  const [pending, startTransition] = useTransition()
   return (
     <form
       noValidate
@@ -45,7 +47,10 @@ function NameForm({ defaultName, serverError, onConfirm }: Omit<Props, 'open' | 
         const trimmed = name.trim()
         if (!trimmed) return setError('이름을 입력해 주세요')
         if (trimmed.length > 20) return setError('20자 이내로 입력해 주세요')
-        onConfirm(trimmed)
+        startTransition(async () => {
+          const err = await onConfirm(trimmed)
+          if (err) setError(err)
+        })
       }}
     >
       <DialogHeader>
@@ -70,8 +75,8 @@ function NameForm({ defaultName, serverError, onConfirm }: Omit<Props, 'open' | 
         <FieldError id="voter-name-error" message={error} />
       </div>
       <DialogFooter>
-        <Button type="submit" size="lg" className="w-full">
-          확인
+        <Button type="submit" size="lg" className="w-full" disabled={pending}>
+          {pending ? '저장 중…' : '확인'}
         </Button>
       </DialogFooter>
     </form>

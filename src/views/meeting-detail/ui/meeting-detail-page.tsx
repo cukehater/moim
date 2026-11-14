@@ -1,14 +1,14 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Suspense } from 'react'
-import { getDisplayStatus, getMeetingStatus, StatusBadge } from '@/entities/meeting'
+import { type ReactNode, Suspense } from 'react'
+import { getDisplayStatus, getMeetingStatus, resolveConfirmation, StatusBadge } from '@/entities/meeting'
 import { getMeeting } from '@/entities/meeting/index.server'
 import { getTallies } from '@/entities/vote/index.server'
 import { CloseReopenButton } from '@/features/meeting-close-reopen'
 import { DeleteMeetingButton } from '@/features/meeting-delete'
 import { MeetingResultTable } from '@/widgets/meeting-result-table'
 import { requireAdmin } from '@/shared/auth'
-import { dayParts, formatDateTime } from '@/shared/lib'
+import { dayParts, formatDateTime, mapHref } from '@/shared/lib'
 import { Button } from '@/shared/ui/button'
 import { CopyLinkButton } from '@/shared/ui/copy-link-button'
 import { PageHeader } from '@/shared/ui/page-header'
@@ -33,7 +33,8 @@ async function MeetingDetail({ params }: Pick<PageProps<'/dashboard/[id]'>, 'par
 
   const now = new Date()
   const status = getMeetingStatus(meeting, now)
-  const confirmed = meeting.options.find((o) => o.id === meeting.confirmedOptionId)
+  const confirmation = status === 'closed' ? resolveConfirmation(meeting.confirmedOptionId, meeting.options) : null
+  const confirmed = meeting.options.find((o) => o.id === confirmation?.optionId)
   const confirmedParts = confirmed && dayParts(confirmed.date)
 
   return (
@@ -59,7 +60,7 @@ async function MeetingDetail({ params }: Pick<PageProps<'/dashboard/[id]'>, 'par
             />
           )}
           <div>
-            <StatusBadge status={getDisplayStatus(meeting, now)} />
+            <StatusBadge status={getDisplayStatus(meeting, now, meeting.options)} />
             <h2 className="mt-2 text-title font-bold text-balance">{meeting.title}</h2>
             {meeting.description && (
               <p className="mt-2 text-body whitespace-pre-line text-gray-800">{meeting.description}</p>
@@ -82,7 +83,21 @@ async function MeetingDetail({ params }: Pick<PageProps<'/dashboard/[id]'>, 'par
           <h3 className="section-label">정보</h3>
           <dl className="grouped">
             <InfoRow label="모임장" value={meeting.host} />
-            {meeting.location && <InfoRow label="장소" value={meeting.location} />}
+            {meeting.location && (
+              <InfoRow
+                label="장소"
+                value={
+                  <a
+                    href={mapHref(meeting.location, meeting.mapUrl)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-brand underline-offset-4 hover:underline"
+                  >
+                    {meeting.location}
+                  </a>
+                }
+              />
+            )}
             <InfoRow label="시작" value={formatDateTime(meeting.startsAt)} />
             <InfoRow label="종료" value={formatDateTime(meeting.endsAt)} />
             <InfoRow label="이름" value={meeting.isAnonymous ? '익명' : '기명'} />
@@ -103,11 +118,10 @@ async function MeetingDetail({ params }: Pick<PageProps<'/dashboard/[id]'>, 'par
             options={meeting.options}
             tallies={tallies}
             isAnonymous={meeting.isAnonymous}
-            canConfirm={status === 'closed'}
-            confirmedOptionId={meeting.confirmedOptionId}
+            confirmation={confirmation}
           />
-          {status === 'closed' && !confirmed && (
-            <p className="px-4 pt-2 text-caption text-gray-500">마감됐어요. 최종 날짜를 확정해 주세요.</p>
+          {confirmation && !confirmed && (
+            <p className="px-4 pt-2 text-caption text-gray-500">동점이에요. 최종 날짜를 골라 주세요.</p>
           )}
         </section>
 
@@ -117,7 +131,7 @@ async function MeetingDetail({ params }: Pick<PageProps<'/dashboard/[id]'>, 'par
   )
 }
 
-function InfoRow({ label, value }: { label: string; value: string }) {
+function InfoRow({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="flex min-h-tap items-center gap-4 px-4 py-2.5">
       <dt className="text-body">{label}</dt>

@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { CancelVoteButton } from '@/features/vote-cancel'
-import { NameDialog, submitVote } from '@/features/vote-submit'
+import { NameDialog, renameVoter, submitVote } from '@/features/vote-submit'
 import { Button } from '@/shared/ui/button'
 import { OptionCard, type VoteOption } from './option-card'
 
@@ -89,7 +89,13 @@ export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVo
         onOpenChange={(open) => !open && setNameDialog(null)}
         defaultName={name}
         serverError={nameDialog?.error}
-        onConfirm={(n) => {
+        onConfirm={async (n) => {
+          // 이미 투표했으면 이름만 바로 저장 (모든 날짜에 반영)
+          if (myVote && n !== myVote.name) {
+            const r = await renameVoter(meetingId, n)
+            if (!r.ok) return r.fieldErrors?.name?.[0] ?? r.message ?? '이름을 바꾸지 못했어요'
+            toast.success('이름을 바꿨어요')
+          }
           setName(n)
           if (nameDialog?.pendingId) apply(nameDialog.pendingId)
           setNameDialog(null)

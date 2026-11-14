@@ -1,7 +1,7 @@
 import { CalendarPlus, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { Suspense } from 'react'
-import { getDisplayStatus, getMeetingStatus, type MeetingStatus } from '@/entities/meeting'
+import { getDisplayStatus, getMeetingStatus, resolveConfirmation, type MeetingStatus } from '@/entities/meeting'
 import { getMeetings } from '@/entities/meeting/index.server'
 import { MeetingGallery } from '@/widgets/meeting-gallery'
 import { requireAdmin } from '@/shared/auth'
@@ -47,12 +47,16 @@ async function DashboardContent({ searchParams }: Pick<PageProps<'/dashboard'>, 
   const now = new Date()
   const items = rows
     .filter((m) => !current.value || getMeetingStatus(m, now) === current.value)
-    .map((m) => ({
-      meeting: m,
-      status: getDisplayStatus(m, now),
-      responseCount: m.responseCount,
-      confirmedDate: m.confirmedDate,
-    }))
+    .map((m) => {
+      const status = getDisplayStatus(m, now, m.options)
+      const confirmedId = resolveConfirmation(m.confirmedOptionId, m.options).optionId
+      return {
+        meeting: m,
+        status,
+        responseCount: m.responseCount,
+        confirmedDate: status === 'confirmed' ? m.options.find((o) => o.id === confirmedId)?.date : null,
+      }
+    })
 
   if (rows.length === 0) {
     return (

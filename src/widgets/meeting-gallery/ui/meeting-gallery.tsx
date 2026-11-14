@@ -1,7 +1,7 @@
 import { type DisplayStatus, MeetingCard } from '@/entities/meeting'
 import type { Meeting } from '@/entities/meeting/index.server'
 
-type Item = { meeting: Meeting; status: DisplayStatus; responseCount: number; confirmedDate: string | null }
+type Item = { meeting: Meeting; status: DisplayStatus; responseCount: number; confirmedDate?: string | null }
 
 export function MeetingGallery({ items }: { items: Item[] }) {
   return (

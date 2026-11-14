@@ -5,6 +5,16 @@ const DATETIME_LOCAL = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/
 
 export const resultVisibilityValues = ['always', 'after_vote', 'after_close'] as const
 
+// 공유 링크(naver.me)와 지도 페이지(map.naver.com 등)만 허용
+function isNaverMapUrl(v: string) {
+  try {
+    const { protocol, hostname } = new URL(v)
+    return protocol === 'https:' && (hostname === 'naver.me' || hostname.endsWith('.naver.com'))
+  } catch {
+    return false
+  }
+}
+
 export const datetimeLocalSchema = z.string().regex(DATETIME_LOCAL, '날짜와 시간을 입력해 주세요')
 
 export const meetingInputSchema = z
@@ -13,6 +23,11 @@ export const meetingInputSchema = z
     host: z.string().trim().min(1, '모임장을 입력해 주세요').max(30, '30자 이내로 입력해 주세요'),
     description: z.string().trim().max(500, '500자 이내로 입력해 주세요'),
     location: z.string().trim().max(100, '100자 이내로 입력해 주세요'),
+    mapUrl: z
+      .string()
+      .trim()
+      .max(300, '300자 이내로 입력해 주세요')
+      .refine((v) => !v || isNaverMapUrl(v), '네이버 지도 링크를 붙여 넣어 주세요'),
     thumbnailId: z.string().min(1).nullable(),
     isAnonymous: z.boolean(),
     allowMultiple: z.boolean(),
@@ -26,5 +41,6 @@ export const meetingInputSchema = z
   })
   // 같은 'yyyy-MM-ddTHH:mm' 포맷이라 문자열 비교로 충분
   .refine((v) => v.endsAt > v.startsAt, { path: ['endsAt'], message: '종료는 시작 이후여야 해요' })
+  .refine((v) => !v.mapUrl || v.location, { path: ['location'], message: '지도 링크를 넣으면 장소명도 입력해 주세요' })
 
 export type MeetingInput = z.infer<typeof meetingInputSchema>

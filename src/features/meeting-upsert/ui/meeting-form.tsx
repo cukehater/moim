@@ -86,7 +86,7 @@ export function MeetingForm({ meetingId, defaultValues, hasVotes, renderThumbnai
         <Controller control={control} name="thumbnailId" render={({ field }) => <>{renderThumbnail(field)}</>} />
       </section>
 
-      <Group label="기본 정보" errors={[err('title'), err('host'), err('location'), err('description')]}>
+      <Group label="기본 정보" errors={[err('title'), err('host'), err('location'), err('mapUrl'), err('description')]}>
         {/* 그룹 구분선은 ::before로 그리므로 input은 div로 감쌈 */}
         <div>
           <Input aria-label="제목" placeholder="제목 (필수)" maxLength={80} aria-invalid={!!err('title')} {...register('title')} />
@@ -95,7 +95,18 @@ export function MeetingForm({ meetingId, defaultValues, hasVotes, renderThumbnai
           <Input aria-label="모임장" placeholder="모임장 (필수)" maxLength={30} aria-invalid={!!err('host')} {...register('host')} />
         </div>
         <div>
-          <Input aria-label="장소" placeholder="장소" maxLength={100} {...register('location')} />
+          <Input aria-label="장소" placeholder="장소" maxLength={100} aria-invalid={!!err('location')} {...register('location')} />
+        </div>
+        <div>
+          <Input
+            type="url"
+            inputMode="url"
+            aria-label="네이버 지도 링크"
+            placeholder="네이버 지도 링크 (선택)"
+            maxLength={300}
+            aria-invalid={!!err('mapUrl')}
+            {...register('mapUrl')}
+          />
         </div>
         <div>
           <Textarea aria-label="설명" placeholder="설명" maxLength={500} rows={3} {...register('description')} />

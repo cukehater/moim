@@ -31,7 +31,8 @@ export async function reopenMeeting(id: string, newEndsAt?: string): Promise<Act
     }
   }
 
-  await db.update(meetings).set({ closedAt: null, endsAt }).where(eq(meetings.id, id))
+  // 다시 마감되면 그때 득표로 재계산
+  await db.update(meetings).set({ closedAt: null, endsAt, confirmedOptionId: null }).where(eq(meetings.id, id))
   revalidateMeeting(id)
   return { ok: true, data: undefined }
 }

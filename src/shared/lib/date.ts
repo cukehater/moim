@@ -12,8 +12,8 @@ export const formatDay = (day: string) => format(parseISO(day), 'M/d(EEE)', { lo
 /** → '12/20(토) 19:00' (KST) */
 export const formatDateTime = (d: Date) => format(new TZDate(d, TZ), 'M/d(EEE) HH:mm', { locale: ko })
 
-/** → '12/20' (KST) */
-export const formatShortDate = (d: Date) => format(new TZDate(d, TZ), 'M/d')
+/** → '2026.12.20 19:00' (KST) */
+export const formatPeriod = (d: Date) => format(new TZDate(d, TZ), 'yyyy.MM.dd HH:mm')
 
 /** datetime-local 입력값 (KST) */
 export const toKstInput = (d: Date) => format(new TZDate(d, TZ), "yyyy-MM-dd'T'HH:mm")

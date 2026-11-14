@@ -1,12 +1,12 @@
 import { Clock, type LucideIcon, MapPin, UserRound } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import { type ReactNode, Suspense } from 'react'
-import { canSeeResults, getMeetingStatus } from '@/entities/meeting'
+import { canSeeResults, getMeetingStatus, resolveConfirmation } from '@/entities/meeting'
 import { getMeeting } from '@/entities/meeting/index.server'
 import { getMyVote, getTallies } from '@/entities/vote/index.server'
 import { StatusOverlay } from '@/widgets/status-overlay'
 import { OptionList, VoteBoard, type VoteOption } from '@/widgets/vote-board'
-import { dayParts, formatDateTime, formatRemaining } from '@/shared/lib'
+import { dayParts, formatDateTime, formatRemaining, mapHref } from '@/shared/lib'
 import { getVoterToken } from '@/shared/lib/voter-token'
 import { Thumbnail } from '@/shared/ui/thumbnail'
 
@@ -36,11 +36,13 @@ async function Vote({ params }: Pick<PageProps<'/m/[id]'>, 'params'>) {
     ...dayParts(o.date),
     ...(tallies && {
       count: tallies[o.id]?.count ?? 0,
-      names: tallies[o.id]?.names,
+      voters: tallies[o.id]?.voters,
       ratio: (tallies[o.id]?.count ?? 0) / max,
     }),
   }))
-  const confirmed = meeting.options.find((o) => o.id === meeting.confirmedOptionId)
+  const confirmedId =
+    status === 'closed' ? resolveConfirmation(meeting.confirmedOptionId, meeting.options).optionId : null
+  const confirmed = meeting.options.find((o) => o.id === confirmedId)
   const confirmedParts = confirmed && dayParts(confirmed.date)
 
   return (
@@ -65,7 +67,15 @@ async function Vote({ params }: Pick<PageProps<'/m/[id]'>, 'params'>) {
             </InfoItem>
             {meeting.location && (
               <InfoItem icon={MapPin} label="장소">
-                {meeting.location}
+                <a
+                  href={mapHref(meeting.location, meeting.mapUrl)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold underline decoration-gray-300 underline-offset-4"
+                >
+                  {meeting.location}
+                  <span className="sr-only"> (네이버 지도에서 열기)</span>
+                </a>
               </InfoItem>
             )}
             <InfoItem icon={Clock} label="투표 마감">
@@ -137,7 +147,7 @@ function InfoItem({ icon: Icon, label, children }: { icon: LucideIcon; label: st
 function VoteSkeleton() {
   return (
     <div aria-busy className="animate-pulse pt-14">
-      <div className="aspect-video w-full bg-gray-100" />
+      <div className="aspect-[40/21] w-full bg-gray-100" />
       <div className="mx-5 mt-5 h-8 w-2/3 rounded-md bg-gray-100" />
       <div className="mx-5 mt-5 h-16 w-1/2 rounded-md bg-gray-100" />
       <div className="mt-6 h-2 bg-gray-100" />

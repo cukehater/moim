@@ -22,7 +22,6 @@ export function LoginPage({ searchParams }: PageProps<'/login'>) {
             Google로 계속하기
           </Button>
         </form>
-        <p className="text-center text-caption text-gray-500">운영자 계정만 로그인할 수 있어요</p>
       </div>
     </main>
   )
@@ -32,7 +31,7 @@ async function LoginError({ searchParams }: Pick<PageProps<'/login'>, 'searchPar
   const { error } = await searchParams
   if (!error) return null
   return (
-    <p role="alert" className="rounded-xl bg-white px-4 py-3 text-sub text-destructive">
+    <p role="alert" className="rounded-xl bg-white px-4 py-3 text-center text-sub text-destructive">
       {error === 'AccessDenied' ? '운영자 계정만 로그인할 수 있어요' : '로그인하지 못했어요. 다시 시도해 주세요'}
     </p>
   )

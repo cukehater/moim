@@ -24,7 +24,7 @@ export function ThumbnailUpload({ value, onChange }: Props) {
             clientAllowedFormats: ['jpg', 'jpeg', 'png', 'webp', 'heic'],
             maxFileSize: 10_000_000,
             cropping: true,
-            croppingAspectRatio: 16 / 9,
+            croppingAspectRatio: 1200 / 630,
             showSkipCropButton: false,
             language: 'ko',
             // 서명은 서버 액션에서만 발급 (route handler 없이)

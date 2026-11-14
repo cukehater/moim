@@ -1,1 +1,1 @@
-export { VotePage as default } from '@/views/vote'
+export { VotePage as default, generateVoteMetadata as generateMetadata } from '@/views/vote'

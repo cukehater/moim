@@ -6,6 +6,7 @@ const valid: MeetingInput = {
   host: '모임장',
   description: '',
   location: '',
+  mapUrl: '',
   thumbnailId: null,
   isAnonymous: false,
   allowMultiple: true,
@@ -27,6 +28,16 @@ describe('meetingInputSchema', () => {
   it('후보 날짜가 없거나 중복이면 실패', () => {
     expect(meetingInputSchema.safeParse({ ...valid, dates: [] }).success).toBe(false)
     expect(meetingInputSchema.safeParse({ ...valid, dates: ['2026-12-20', '2026-12-20'] }).success).toBe(false)
+  })
+  it('지도 링크는 네이버 https 링크만, 있으면 장소명 필수', () => {
+    const at = (mapUrl: string, location = '강남역') => meetingInputSchema.safeParse({ ...valid, location, mapUrl })
+    expect(at('https://naver.me/xYz12').success).toBe(true)
+    expect(at('https://map.naver.com/p/entry/place/123').success).toBe(true)
+    expect(at('http://naver.me/xYz12').success).toBe(false)
+    expect(at('https://evil.com/?naver.com').success).toBe(false)
+    expect(at('https://naver.com.evil.com').success).toBe(false)
+    expect(at('강남역').success).toBe(false)
+    expect(at('https://naver.me/xYz12', '').error?.issues[0].path).toEqual(['location'])
   })
   it('제목은 trim 후 1~80자', () => {
     expect(meetingInputSchema.safeParse({ ...valid, title: '   ' }).success).toBe(false)

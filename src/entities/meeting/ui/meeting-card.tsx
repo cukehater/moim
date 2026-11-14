@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { dayParts, formatShortDate } from '@/shared/lib'
+import { dayParts, formatPeriod } from '@/shared/lib'
 import { Thumbnail } from '@/shared/ui/thumbnail'
 import type { Meeting } from '../api'
 import type { DisplayStatus } from '../model'
@@ -27,8 +27,8 @@ export function MeetingCard({ meeting, status, responseCount, confirmedDate }: P
       />
       <div className="flex min-w-0 flex-1 flex-col">
         <h2 className="line-clamp-2 text-body font-semibold">{meeting.title}</h2>
-        <p className="mt-0.5 truncate text-caption text-gray-600 tabular">
-          {formatShortDate(meeting.startsAt)} ~ {formatShortDate(meeting.endsAt)}
+        <p className="mt-0.5 truncate text-[0.6875rem] text-gray-600 tabular">
+          {formatPeriod(meeting.startsAt)} ~ {formatPeriod(meeting.endsAt)}
         </p>
         <p className="mt-1.5 flex min-w-0 items-center gap-1.5 text-sub">
           <StatusBadge status={status} />

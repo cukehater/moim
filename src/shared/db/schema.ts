@@ -31,6 +31,7 @@ export const meetings = pgTable(
     host: varchar('host', { length: 30 }).notNull(),
     description: varchar('description', { length: 500 }),
     location: varchar('location', { length: 100 }),
+    mapUrl: varchar('map_url', { length: 300 }),
     thumbnailId: text('thumbnail_id'),
     isAnonymous: boolean('is_anonymous').notNull(),
     allowMultiple: boolean('allow_multiple').notNull(),
