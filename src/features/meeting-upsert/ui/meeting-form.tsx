@@ -3,8 +3,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { format } from 'date-fns/format'
 import { parseISO } from 'date-fns/parseISO'
+import { startOfToday } from 'date-fns/startOfToday'
 import { ko } from 'date-fns/locale/ko'
-import { Check } from 'lucide-react'
+import { Check, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { type ReactNode, useState, useTransition } from 'react'
 import { Controller, type Path, useForm } from 'react-hook-form'
@@ -51,6 +52,8 @@ export function MeetingForm({ meetingId, defaultValues, hasVotes, renderThumbnai
   const form = useForm<MeetingInput>({ resolver: zodResolver(meetingInputSchema), defaultValues })
   const { register, control, handleSubmit, setError, formState } = form
   const err = (name: keyof MeetingInput) => formState.errors[name]?.message
+  // 익명으로 받은 투표가 있으면 기명 전환 금지 (서버에서도 막음)
+  const anonymousLocked = !!meetingId && hasVotes && defaultValues.isAnonymous
 
   const save = (values: MeetingInput) =>
     startTransition(async () => {
@@ -73,8 +76,6 @@ export function MeetingForm({ meetingId, defaultValues, hasVotes, renderThumbnai
         w.push('삭제한 후보 날짜에 들어온 투표는 함께 지워져요.')
       if (!defaultValues.isAnonymous && values.isAnonymous)
         w.push('익명으로 바꾸면 투표자 이름이 숨겨져요. 이름 데이터는 보존돼요.')
-      if (defaultValues.isAnonymous && !values.isAnonymous)
-        w.push('기명으로 바꾸면 기존 투표는 "(이름 없음)"으로 표시돼요.')
     }
     if (w.length) return setConfirming({ values, warnings: w })
     save(values)
@@ -86,8 +87,7 @@ export function MeetingForm({ meetingId, defaultValues, hasVotes, renderThumbnai
         <Controller control={control} name="thumbnailId" render={({ field }) => <>{renderThumbnail(field)}</>} />
       </section>
 
-      <Group label="기본 정보" errors={[err('title'), err('host'), err('location'), err('mapUrl'), err('description')]}>
-        {/* 그룹 구분선은 ::before로 그리므로 input은 div로 감쌈 */}
+      <Group label="기본 정보" boxed={false} errors={[err('title'), err('host'), err('location'), err('mapUrl'), err('description')]}>
         <div>
           <Input aria-label="제목" placeholder="제목 (필수)" maxLength={80} aria-invalid={!!err('title')} {...register('title')} />
         </div>
@@ -119,7 +119,13 @@ export function MeetingForm({ meetingId, defaultValues, hasVotes, renderThumbnai
         render={({ field, fieldState }) => (
           <Group
             label="후보 날짜"
-            footer={field.value.length > 0 ? `${field.value.length}개 · ${field.value.map(formatDay).join(', ')}` : '달력에서 날짜를 눌러 고르세요.'}
+            footer={
+              field.value.length > 0 ? (
+                <SelectedDates dates={field.value} onRemove={(d) => field.onChange(field.value.filter((v) => v !== d))} />
+              ) : (
+                '달력에서 날짜를 눌러 고르세요.'
+              )
+            }
             errors={[fieldState.error?.message ?? fieldState.error?.root?.message]}
           >
             <div className="px-2 py-2">
@@ -127,8 +133,11 @@ export function MeetingForm({ meetingId, defaultValues, hasVotes, renderThumbnai
                 mode="multiple"
                 locale={ko}
                 selected={field.value.map((d) => parseISO(d))}
+                // 지난 날짜는 후보로 고를 수 없음
+                disabled={{ before: startOfToday() }}
+                showOutsideDays={false}
                 onSelect={(days) => field.onChange((days ?? []).map((d) => format(d, 'yyyy-MM-dd')).sort())}
-                className="mx-auto w-full bg-transparent p-1 [--cell-size:2.75rem]"
+                className="mx-auto w-full bg-transparent p-1 [--cell-size:2.25rem]"
               />
             </div>
           </Group>
@@ -144,13 +153,26 @@ export function MeetingForm({ meetingId, defaultValues, hasVotes, renderThumbnai
         </Row>
       </Group>
 
-      <Group label="투표 방식" footer="익명이면 이름을 묻지 않아요. 여러 날짜를 끄면 하루만 고를 수 있어요.">
+      <Group
+        label="투표 방식"
+        footer={
+          anonymousLocked
+            ? '익명으로 투표가 들어와서 기명으로 바꿀 수 없어요.'
+            : '익명이면 이름을 묻지 않아요. 여러 날짜를 끄면 하루만 고를 수 있어요.'
+        }
+        errors={[err('isAnonymous')]}
+      >
         <Controller
           control={control}
           name="isAnonymous"
           render={({ field }) => (
             <Row label="익명 투표" htmlFor="isAnonymous">
-              <Switch id="isAnonymous" checked={field.value} onCheckedChange={field.onChange} />
+              <Switch
+                id="isAnonymous"
+                checked={field.value}
+                onCheckedChange={field.onChange}
+                disabled={anonymousLocked}
+              />
             </Row>
           )}
         />
@@ -177,10 +199,10 @@ export function MeetingForm({ meetingId, defaultValues, hasVotes, renderThumbnai
                 role="radio"
                 aria-checked={field.value === v.value}
                 onClick={() => field.onChange(v.value)}
-                className="flex min-h-tap w-full items-center px-4 text-left text-body active:bg-gray-200"
+                className="flex min-h-tap w-full items-center px-4 text-left text-sub hover:bg-gray-50 active:bg-gray-100"
               >
                 <span className="flex-1">{v.label}</span>
-                {field.value === v.value && <Check className="size-5 text-brand" strokeWidth={2.5} aria-hidden />}
+                {field.value === v.value && <Check className="size-4 text-brand" strokeWidth={2.5} aria-hidden />}
               </button>
             ))}
           </Group>
@@ -217,18 +239,24 @@ export function MeetingForm({ meetingId, defaultValues, hasVotes, renderThumbnai
   )
 }
 
-const DATE_INPUT = 'h-9 w-auto rounded-md bg-gray-100 px-2.5 text-right'
+const DATE_INPUT = 'h-9 w-auto rounded-md border-0 bg-gray-100 px-2.5 text-right shadow-none'
 
-/** iOS 그룹: 머리말 + 흰 묶음 + 꼬리말/에러 */
-function Group(props: { label: string; footer?: string; errors?: (string | undefined)[]; children: ReactNode }) {
+/** 섹션: 머리말 + 테두리 묶음(boxed) 또는 쌓인 인풋 + 꼬리말/에러 */
+function Group(props: {
+  label: string
+  footer?: ReactNode
+  errors?: (string | undefined)[]
+  boxed?: boolean
+  children: ReactNode
+}) {
   const errors = props.errors?.filter(Boolean) ?? []
   return (
     <section>
       <h2 className="section-label">{props.label}</h2>
-      <div className="grouped">{props.children}</div>
-      {props.footer && <p className="px-4 pt-1.5 text-caption text-gray-500">{props.footer}</p>}
+      <div className={props.boxed === false ? 'flex flex-col gap-2' : 'grouped'}>{props.children}</div>
+      {props.footer && <div className="pt-2 text-caption text-gray-600">{props.footer}</div>}
       {errors.map((e) => (
-        <div key={e} className="px-4 pt-1.5">
+        <div key={e} className="pt-1.5">
           <FieldError message={e} />
         </div>
       ))}
@@ -236,10 +264,39 @@ function Group(props: { label: string; footer?: string; errors?: (string | undef
   )
 }
 
+/** 고른 후보 날짜: 개수 + 하나씩 뺄 수 있는 칩 */
+function SelectedDates({ dates, onRemove }: { dates: string[]; onRemove: (date: string) => void }) {
+  return (
+    <>
+      <p className="pb-2">
+        <b className="font-semibold text-gray-900 tabular">{dates.length}개</b> 골랐어요
+      </p>
+      <ul className="grid grid-cols-4 gap-1.5">
+        {dates.map((d) => (
+          <li
+            key={d}
+            className="flex h-7 items-center justify-between rounded-md bg-gray-100 pr-1 pl-2 text-caption font-medium text-gray-900 tabular"
+          >
+            {formatDay(d)}
+            <button
+              type="button"
+              aria-label={`${formatDay(d)} 빼기`}
+              onClick={() => onRemove(d)}
+              className="relative flex size-5 items-center justify-center rounded text-gray-500 after:absolute after:-inset-2 hover:bg-gray-200 hover:text-gray-900"
+            >
+              <X className="size-3" strokeWidth={2.5} aria-hidden />
+            </button>
+          </li>
+        ))}
+      </ul>
+    </>
+  )
+}
+
 function Row(props: { label: string; htmlFor: string; children: ReactNode }) {
   return (
     <div className="flex min-h-tap items-center justify-between gap-3 py-1.5 pr-3 pl-4">
-      <Label htmlFor={props.htmlFor} className="text-body font-normal text-gray-900">
+      <Label htmlFor={props.htmlFor} className="text-sub font-normal text-gray-900">
         {props.label}
       </Label>
       {props.children}

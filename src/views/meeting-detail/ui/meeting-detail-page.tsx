@@ -8,7 +8,8 @@ import { CloseReopenButton } from '@/features/meeting-close-reopen'
 import { DeleteMeetingButton } from '@/features/meeting-delete'
 import { MeetingResultTable } from '@/widgets/meeting-result-table'
 import { requireAdmin } from '@/shared/auth'
-import { dayParts, formatDateTime, mapHref } from '@/shared/lib'
+import { dayParts, formatDateTime, formatDday, mapHref } from '@/shared/lib'
+import { DdayBadge } from '@/shared/ui/dday-badge'
 import { Button } from '@/shared/ui/button'
 import { CopyLinkButton } from '@/shared/ui/copy-link-button'
 import { PageHeader } from '@/shared/ui/page-header'
@@ -29,7 +30,7 @@ async function MeetingDetail({ params }: Pick<PageProps<'/dashboard/[id]'>, 'par
   const { id } = await params
   const meeting = await getMeeting(id)
   if (!meeting) notFound()
-  const { tallies, voterCount } = await getTallies(id, !meeting.isAnonymous)
+  const { tallies, voterCount } = await getTallies(id, false)
 
   const now = new Date()
   const status = getMeetingStatus(meeting, now)
@@ -43,68 +44,59 @@ async function MeetingDetail({ params }: Pick<PageProps<'/dashboard/[id]'>, 'par
         title={meeting.title}
         backHref="/dashboard"
         action={
-          <Button asChild variant="ghost" className="h-tap px-3">
+          <Button asChild variant="ghost" size="sm" className="h-9">
             <Link href={`/dashboard/${id}/edit`}>편집</Link>
           </Button>
         }
       />
-      <main className="flex flex-col gap-7 px-5 pt-4 pb-16">
+      {/* 노션 페이지: 커버 → 제목 → 속성 → 결과 */}
+      {meeting.thumbnailId && (
+        <Thumbnail publicId={meeting.thumbnailId} alt="" sizes="(max-width: 500px) 100vw, 500px" priority />
+      )}
+      <main className="flex flex-col gap-6 px-5 pt-5 pb-16">
         <div>
-          {meeting.thumbnailId && (
-            <Thumbnail
-              publicId={meeting.thumbnailId}
-              alt=""
-              sizes="(max-width: 500px) 100vw, 500px"
-              priority
-              className="-mx-5 -mt-4 mb-4 w-auto"
-            />
-          )}
-          <div>
-            <StatusBadge status={getDisplayStatus(meeting, now, meeting.options)} />
-            <h2 className="mt-2 text-title font-bold text-balance">{meeting.title}</h2>
-            {meeting.description && (
-              <p className="mt-2 text-body whitespace-pre-line text-gray-800">{meeting.description}</p>
-            )}
-          </div>
-        </div>
-
-        {confirmedParts && (
-          <div className="grouped">
-            <div className="flex min-h-tap items-center px-4">
-              <span className="flex-1 text-body">최종 날짜</span>
-              <span className="text-body font-semibold text-brand">
-                {confirmedParts.label} {confirmedParts.weekday}요일
-              </span>
-            </div>
-          </div>
-        )}
-
-        <section>
-          <h3 className="section-label">정보</h3>
-          <dl className="grouped">
-            <InfoRow label="모임장" value={meeting.host} />
+          <h2 className="text-title font-semibold text-balance">{meeting.title}</h2>
+          <dl className="mt-3 flex flex-col">
+            <Property label="상태">
+              <StatusBadge status={getDisplayStatus(meeting, now, meeting.options)} className="text-sub" />
+              {confirmedParts && (
+                <span className="ml-2 font-medium">
+                  {confirmedParts.label} {confirmedParts.weekday}요일
+                </span>
+              )}
+              {confirmed && formatDday(confirmed.date, now) && (
+                <DdayBadge className="ml-2">{formatDday(confirmed.date, now)!}</DdayBadge>
+              )}
+            </Property>
+            <Property label="모임장">{meeting.host}</Property>
             {meeting.location && (
-              <InfoRow
-                label="장소"
-                value={
-                  <a
-                    href={mapHref(meeting.location, meeting.mapUrl)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-brand underline-offset-4 hover:underline"
-                  >
-                    {meeting.location}
-                  </a>
-                }
-              />
+              <Property label="장소">
+                <a
+                  href={mapHref(meeting.location, meeting.mapUrl)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline decoration-gray-300 underline-offset-4 hover:decoration-gray-600"
+                >
+                  {meeting.location}
+                </a>
+              </Property>
             )}
-            <InfoRow label="시작" value={formatDateTime(meeting.startsAt)} />
-            <InfoRow label="종료" value={formatDateTime(meeting.endsAt)} />
-            <InfoRow label="이름" value={meeting.isAnonymous ? '익명' : '기명'} />
-            <InfoRow label="선택" value={meeting.allowMultiple ? '여러 날짜' : '한 날짜'} />
-            <InfoRow label="결과 공개" value={VISIBILITY_LABEL[meeting.resultVisibility]} />
+            <Property label="투표 기간">
+              <span className="tabular">
+                {formatDateTime(meeting.startsAt)} ~ {formatDateTime(meeting.endsAt)}
+              </span>
+            </Property>
+            <Property label="방식">
+              {meeting.isAnonymous ? '익명' : '기명'} · {meeting.allowMultiple ? '여러 날짜' : '한 날짜'} ·{' '}
+              {VISIBILITY_LABEL[meeting.resultVisibility]}
+            </Property>
           </dl>
-        </section>
+          {meeting.description && (
+            <p className="mt-4 border-t border-gray-200 pt-4 text-body whitespace-pre-line text-gray-800">
+              {meeting.description}
+            </p>
+          )}
+        </div>
 
         <div className="grid grid-cols-2 gap-2">
           <CopyLinkButton path={`/m/${id}`} />
@@ -112,16 +104,17 @@ async function MeetingDetail({ params }: Pick<PageProps<'/dashboard/[id]'>, 'par
         </div>
 
         <section>
-          <h3 className="section-label">날짜별 결과 · 응답 {voterCount}명</h3>
+          <h3 className="pb-2.5 text-heading font-semibold">
+            날짜별 결과 <span className="text-sub font-normal text-gray-600">· 응답 {voterCount}명</span>
+          </h3>
           <MeetingResultTable
             meetingId={id}
             options={meeting.options}
             tallies={tallies}
-            isAnonymous={meeting.isAnonymous}
             confirmation={confirmation}
           />
           {confirmation && !confirmed && (
-            <p className="px-4 pt-2 text-caption text-gray-500">동점이에요. 최종 날짜를 골라 주세요.</p>
+            <p className="pt-2 text-caption text-gray-600">동점이에요. 최종 날짜를 골라 주세요.</p>
           )}
         </section>
 
@@ -131,11 +124,11 @@ async function MeetingDetail({ params }: Pick<PageProps<'/dashboard/[id]'>, 'par
   )
 }
 
-function InfoRow({ label, value }: { label: string; value: ReactNode }) {
+function Property({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className="flex min-h-tap items-center gap-4 px-4 py-2.5">
-      <dt className="text-body">{label}</dt>
-      <dd className="ml-auto text-right text-body text-gray-500 tabular">{value}</dd>
+    <div className="flex min-h-8 items-start gap-2 py-1 text-sub">
+      <dt className="w-[4.75rem] shrink-0 pt-px text-gray-600">{label}</dt>
+      <dd className="flex min-w-0 flex-wrap items-center text-gray-900">{children}</dd>
     </div>
   )
 }

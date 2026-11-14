@@ -18,24 +18,22 @@ const FILTERS: { value?: MeetingStatus; label: string }[] = [
 export function DashboardPage({ searchParams }: PageProps<'/dashboard'>) {
   return (
     <>
-      <header className="flex h-14 items-center px-5">
+      <header className="sticky top-0 z-10 flex h-13 items-center justify-between bg-white/92 px-5 backdrop-blur-md">
         <h1>
           {/* eslint-disable-next-line @next/next/no-img-element -- 정적 SVG 로고 */}
-          <img src="/logo.svg" alt="MOIM" width={316} height={100} className="h-6 w-auto" />
+          <img src="/logo.svg" alt="MOIM" width={316} height={100} className="h-5 w-auto" />
         </h1>
-      </header>
-      <main className="pb-32">
-        <Suspense fallback={<p className="py-16 text-center text-sub text-gray-600">불러오는 중…</p>}>
-          <DashboardContent searchParams={searchParams} />
-        </Suspense>
-      </main>
-      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 mx-auto flex max-w-[500px] justify-end p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
-        <Button asChild size="lg" className="pointer-events-auto rounded-full pr-5 pl-4 shadow-[0_4px_14px_rgb(0_0_0/0.18)]">
+        <Button asChild size="sm" className="relative after:absolute after:-inset-y-1.5 after:inset-x-0">
           <Link href="/dashboard/new">
             <Plus aria-hidden />새 모임
           </Link>
         </Button>
-      </div>
+      </header>
+      <main className="pb-16">
+        <Suspense fallback={<p className="py-16 text-center text-sub text-gray-600">불러오는 중…</p>}>
+          <DashboardContent searchParams={searchParams} />
+        </Suspense>
+      </main>
     </>
   )
 }
@@ -60,11 +58,11 @@ async function DashboardContent({ searchParams }: Pick<PageProps<'/dashboard'>, 
 
   if (rows.length === 0) {
     return (
-      <div className="flex flex-col items-center px-5 py-24 text-center">
-        <CalendarPlus className="mb-4 size-12 text-gray-400" strokeWidth={1.5} aria-hidden />
-        <p className="text-heading font-semibold">아직 모임이 없어요</p>
-        <p className="mt-1 mb-6 text-sub text-gray-500">후보 날짜를 정하고 링크를 공유해 보세요.</p>
-        <Button asChild size="lg" className="px-8">
+      <div className="mx-5 mt-8 flex flex-col items-center rounded-xl border border-dashed border-gray-300 px-6 py-14 text-center">
+        <CalendarPlus className="mb-3 size-6 text-gray-400" strokeWidth={1.75} aria-hidden />
+        <p className="text-body font-medium">아직 모임이 없어요</p>
+        <p className="mt-1 mb-5 text-sub text-gray-600">후보 날짜를 정하고 링크를 공유해 보세요.</p>
+        <Button asChild>
           <Link href="/dashboard/new">첫 모임 만들기</Link>
         </Button>
       </div>
@@ -73,7 +71,7 @@ async function DashboardContent({ searchParams }: Pick<PageProps<'/dashboard'>, 
 
   return (
     <>
-      <nav aria-label="상태 필터" className="flex gap-5 overflow-x-auto border-b border-gray-200 px-5">
+      <nav aria-label="상태 필터" className="flex gap-1 overflow-x-auto border-b border-gray-200 px-4 pb-3">
         {FILTERS.map((f) => {
           const active = f === current
           return (
@@ -82,8 +80,11 @@ async function DashboardContent({ searchParams }: Pick<PageProps<'/dashboard'>, 
               href={f.value ? `/dashboard?status=${f.value}` : '/dashboard'}
               aria-current={active ? 'page' : undefined}
               className={cn(
-                'flex h-tap shrink-0 items-center text-sub font-bold',
-                active ? 'text-gray-900 shadow-[inset_0_-3px_0_var(--color-gray-900)]' : 'text-gray-600',
+                // 보이는 높이 32px, 누르는 영역은 44px
+                'relative flex h-8 shrink-0 items-center rounded-full border px-3 text-sub font-medium transition-colors after:absolute after:inset-x-0 after:-inset-y-1.5',
+                active
+                  ? 'border-gray-200 bg-gray-100 text-gray-900'
+                  : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900',
               )}
             >
               {f.label}
@@ -92,9 +93,7 @@ async function DashboardContent({ searchParams }: Pick<PageProps<'/dashboard'>, 
         })}
       </nav>
       {items.length ? (
-        <div className="px-5 pt-1">
-          <MeetingGallery items={items} />
-        </div>
+        <MeetingGallery items={items} />
       ) : (
         <p className="px-5 py-20 text-center text-sub text-gray-600">{current.label} 상태인 모임이 없어요</p>
       )}

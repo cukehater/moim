@@ -4,42 +4,48 @@
 @theme inline {
   --font-sans: var(--font-pretendard), system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
 
-  /* 타입 스케일 (390px 기준 px): 26 / 20 / 17 / 15 / 13 */
-  --text-title: 1.625rem;
-  --text-title--line-height: 1.25;
-  --text-title--letter-spacing: -0.035em;
-  --text-heading: 1.25rem;
-  --text-heading--line-height: 1.3;
+  /* 타입 스케일 (390px 기준 px): 22 / 16 / 14 / 13 / 12. 촘촘한 노션·리니어 본문, 굵기는 500·600 */
+  --text-title: 1.375rem;
+  --text-title--line-height: 1.3;
+  --text-title--letter-spacing: -0.028em;
+  --text-heading: 1rem;
+  --text-heading--line-height: 1.4;
   --text-heading--letter-spacing: -0.015em;
-  --text-body: 1.0625rem;
-  --text-body--line-height: 1.4;
-  --text-sub: 0.9375rem;
-  --text-sub--line-height: 1.4;
-  --text-caption: 0.8125rem;
-  --text-caption--line-height: 1.45;
+  --text-body: 0.875rem;
+  --text-body--line-height: 1.5;
+  --text-body--letter-spacing: -0.008em;
+  --text-sub: 0.8125rem;
+  --text-sub--line-height: 1.45;
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.4;
 
   /* 터치 타깃: 390px 기준 48px, rem 축소와 무관하게 최소 44px */
   --spacing-tap: max(44px, 3rem);
-  --spacing-cta: max(50px, 3.375rem);
+  --spacing-cta: max(44px, 2.875rem);
 
-  --color-gray-50: #f7f7f7;
-  --color-gray-100: #f2f2f2;
-  --color-gray-200: #e5e5e5;
-  --color-gray-300: #d4d4d4;
-  --color-gray-400: #b0b0b0;
-  --color-gray-500: #767676;
-  --color-gray-600: #6a6a6a;
-  --color-gray-700: #484848;
-  --color-gray-800: #2b2b2b;
-  --color-gray-900: #15171c;
+  /* 차가운 중성 회색 (리니어 라이트) */
+  --color-gray-50: #f9f9fa;
+  --color-gray-100: #f3f3f5;
+  --color-gray-200: #e8e8eb;
+  --color-gray-300: #d5d6da;
+  --color-gray-400: #a9abb1;
+  --color-gray-500: #7f828a;
+  --color-gray-600: #62656c;
+  --color-gray-700: #45474d;
+  --color-gray-800: #2c2d31;
+  --color-gray-900: #18191b;
 
   --color-brand: var(--brand);
   --color-brand-50: var(--brand-50);
   --color-brand-100: var(--brand-100);
   --color-brand-600: var(--brand-600);
+  /* 약속·설렘: 로고 주황 (D-day, 마감 임박) */
+  --color-promise: #ff6b4a;
+  --color-promise-ink: #d4421f;
+  --color-promise-50: #fff1ec;
   --color-sat: #3355ff;
-  --color-sun: #f0502c;
-  --color-switch-on: #3355ff;
+  --color-sun: #e5484d;
+  --color-switch-on: var(--brand);
   --color-separator: var(--color-gray-200);
 
   --color-background: #ffffff;
@@ -51,23 +57,26 @@
   --color-primary: var(--brand);
   --color-primary-foreground: #ffffff;
   --color-secondary: var(--color-gray-100);
-  --color-secondary-foreground: var(--color-gray-700);
+  --color-secondary-foreground: var(--color-gray-800);
   --color-muted: var(--color-gray-100);
   --color-muted-foreground: var(--color-gray-600);
   --color-accent: var(--color-gray-100);
   --color-accent-foreground: var(--color-gray-900);
-  --color-destructive: #e5402a;
+  --color-destructive: #e5484d;
   --color-border: var(--color-gray-200);
   --color-input: var(--color-gray-200);
   --color-ring: var(--brand);
 
-  /* 당근식 작은 모서리: 6~12px */
+  /* 작은 모서리 4~10px */
   --radius-sm: 0.25rem;
   --radius-md: 0.375rem;
   --radius-lg: 0.5rem;
   --radius-xl: 0.625rem;
   --radius-2xl: 0.75rem;
   --radius-3xl: 0.75rem;
+
+  /* 팝오버·다이얼로그: 1px 윤곽 + 부드러운 그림자 */
+  --shadow-pop: 0 0 0 1px rgb(24 25 27 / 0.06), 0 12px 32px -4px rgb(24 25 27 / 0.14);
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -94,8 +103,9 @@
   margin-inline: auto;
   width: 100%;
   max-width: 500px;
-  padding: 0.875rem 1.25rem calc(1rem + env(safe-area-inset-bottom));
-  background: #fff;
+  padding: 0.75rem 1.25rem calc(0.75rem + env(safe-area-inset-bottom));
+  background: rgb(255 255 255 / 0.92);
+  backdrop-filter: blur(12px);
   box-shadow: inset 0 1px 0 var(--color-gray-200);
 }
 
@@ -103,20 +113,24 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* 눌림 피드백: 살짝 흐려짐 */
+/* 리니어 행 피드백: 호버·눌림에 옅은 회색 */
 @utility pressable {
-  transition: opacity 120ms ease-out, background-color 120ms ease-out;
+  transition: background-color 120ms ease-out;
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--color-gray-50);
+    }
+  }
   &:active {
-    opacity: 0.6;
+    background-color: var(--color-gray-100);
   }
 }
 
-/* iOS 그룹 리스트: 흰 묶음 + 왼쪽 들여쓴 0.5px 구분선 */
+/* 테두리 묶음: 1px 윤곽 + 꽉 찬 1px 구분선 */
 @utility grouped {
   overflow: hidden;
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-lg);
   background: #fff;
-  /* 실제 테두리: 자식(인풋 등) 배경이 inset 그림자를 덮지 않게 */
   border: 1px solid var(--color-gray-200);
   & > * {
     position: relative;
@@ -126,18 +140,18 @@
     position: absolute;
     top: 0;
     right: 0;
-    left: 1rem;
-    height: 0.5px;
+    left: 0;
+    height: 1px;
     background: var(--color-separator);
   }
 }
 
 /* 리스트 위 섹션 머리말 */
 @utility section-label {
-  padding: 0 0.25rem 0.5rem;
-  font-size: var(--text-sub);
-  font-weight: 700;
-  color: var(--color-gray-900);
+  padding: 0 0 0.5rem;
+  font-size: var(--text-caption);
+  font-weight: 500;
+  color: var(--color-gray-600);
 }
 
 @layer base {
@@ -151,7 +165,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-gray-200 text-gray-900 antialiased;
+    @apply bg-gray-100 text-gray-900 antialiased;
     word-break: keep-all;
     caret-color: var(--brand);
   }

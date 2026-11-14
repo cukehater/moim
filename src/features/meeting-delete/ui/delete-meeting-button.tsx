@@ -20,7 +20,7 @@ export function DeleteMeetingButton({ meetingId }: { meetingId: string }) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="secondary" size="lg" className="w-full text-destructive" disabled={pending}>
+        <Button variant="destructive" className="w-full" disabled={pending}>
           모임 삭제
         </Button>
       </AlertDialogTrigger>

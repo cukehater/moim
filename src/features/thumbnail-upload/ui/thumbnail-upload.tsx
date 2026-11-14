@@ -11,10 +11,21 @@ type Props = { value: string | null; onChange: (publicId: string | null) => void
 export function ThumbnailUpload({ value, onChange }: Props) {
   return (
     <div className="flex flex-col gap-2">
-      <div className="overflow-hidden rounded-lg">
-        <Thumbnail publicId={value} alt="썸네일 미리보기" sizes="(max-width: 500px) 100vw, 500px" />
+      <div className="relative overflow-hidden rounded-lg border border-gray-200">
+        {/* 바로 아래 버튼이 설명하므로 장식용 alt */}
+        <Thumbnail publicId={value} alt="" sizes="(max-width: 500px) 100vw, 500px" />
+        {value && (
+          <button
+            type="button"
+            aria-label="썸네일 삭제"
+            onClick={() => onChange(null)}
+            className="absolute top-2 right-2 flex size-8 items-center justify-center rounded-full bg-gray-900/60 text-white backdrop-blur-sm transition-colors after:absolute after:-inset-1.5 hover:bg-gray-900/80"
+          >
+            <X className="size-4" strokeWidth={2.25} aria-hidden />
+          </button>
+        )}
       </div>
-      <div className="flex gap-2">
+      <div>
         <CldUploadWidget
           options={{
             multiple: false,
@@ -37,18 +48,12 @@ export function ThumbnailUpload({ value, onChange }: Props) {
           }}
         >
           {({ open, isLoading }) => (
-            <Button type="button" variant="secondary" className="flex-1" disabled={isLoading} onClick={() => open()}>
+            <Button type="button" variant="secondary" className="w-full" disabled={isLoading} onClick={() => open()}>
               <ImagePlus aria-hidden />
               {value ? '썸네일 바꾸기' : '썸네일 올리기'}
             </Button>
           )}
         </CldUploadWidget>
-        {value && (
-          <Button type="button" variant="ghost" onClick={() => onChange(null)}>
-            <X aria-hidden />
-            삭제
-          </Button>
-        )}
       </div>
     </div>
   )

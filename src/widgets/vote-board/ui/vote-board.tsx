@@ -1,5 +1,6 @@
 'use client'
 
+import { Check } from 'lucide-react'
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { CancelVoteButton } from '@/features/vote-cancel'
@@ -47,7 +48,7 @@ export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVo
       <div
         role={allowMultiple ? 'group' : 'radiogroup'}
         aria-label={allowMultiple ? '참석 가능한 날짜 (여러 개 선택 가능)' : '참석 가능한 날짜 (하나만 선택)'}
-        className="flex flex-col gap-2"
+        className="flex flex-col divide-y divide-gray-200 overflow-hidden rounded-lg border border-gray-200"
       >
         {options.map((o) => (
           <OptionCard
@@ -62,8 +63,8 @@ export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVo
 
       {!isAnonymous && name && (
         <p className="mt-3 text-caption text-gray-600">
-          <b className="font-semibold text-gray-700">{name}</b>님으로 투표해요 ·{' '}
-          <button type="button" onClick={() => setNameDialog({})} className="py-2 font-semibold text-brand underline-offset-2 hover:underline">
+          <b className="font-medium text-gray-900">{name}</b>님으로 투표해요 ·{' '}
+          <button type="button" onClick={() => setNameDialog({})} className="py-2 font-medium text-brand underline-offset-2 hover:underline">
             이름 변경
           </button>
         </p>
@@ -74,12 +75,14 @@ export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVo
           <>
             <CancelVoteButton meetingId={meetingId} onCanceled={() => setSelected([])} />
             <Button size="lg" className="flex-1" disabled={pending || !dirty || selected.length === 0} onClick={submit}>
+              <Check strokeWidth={2.75} aria-hidden />
               {pending ? '저장 중…' : '수정하기'}
             </Button>
           </>
         ) : (
           <Button size="lg" className="w-full" disabled={pending || selected.length === 0} onClick={submit}>
-            {pending ? '투표 중…' : '투표하기'}
+            <Check strokeWidth={2.75} aria-hidden />
+            {pending ? '투표 중…' : !selected.length ? '날짜를 골라 주세요' : allowMultiple ? `${selected.length}개 날짜로 투표하기` : '이 날짜로 투표하기'}
           </Button>
         )}
       </div>

@@ -36,7 +36,7 @@ export function RootLayout({ children }: { children: ReactNode }) {
         <div className="@container/shell mx-auto min-h-dvh w-full max-w-[500px] bg-white">
           {children}
         </div>
-        <Toaster position="top-center" />
+        <Toaster />
       </body>
     </html>
   )

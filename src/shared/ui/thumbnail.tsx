@@ -37,7 +37,7 @@ export function Thumbnail({ publicId, alt, sizes, priority, ratio = OG_RATIO, cl
           loading={priority ? 'eager' : 'lazy'}
           fetchPriority={priority ? 'high' : undefined}
           decoding="async"
-          className="absolute inset-0 size-full object-cover"
+          className="absolute inset-0 size-full object-cover text-[0px] text-transparent"
         />
       ) : (
         <div className="flex size-full items-center justify-center text-gray-300">

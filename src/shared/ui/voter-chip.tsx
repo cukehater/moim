@@ -1,23 +1,41 @@
 import { cn } from '@/shared/lib/cn'
 
-// 브랜드·토(파랑)·일(주황)·에러(빨강)와 겹치지 않는 색만
+// 리니어식 아바타 색. 흰 글자 대비 4.5:1 이상
 const PALETTE = [
-  'bg-emerald-100 text-emerald-800',
-  'bg-violet-100 text-violet-800',
-  'bg-amber-100 text-amber-800',
-  'bg-pink-100 text-pink-800',
-  'bg-teal-100 text-teal-800',
-  'bg-lime-100 text-lime-800',
-  'bg-fuchsia-100 text-fuchsia-800',
-  'bg-cyan-100 text-cyan-800',
+  'bg-emerald-600',
+  'bg-violet-600',
+  'bg-amber-700',
+  'bg-pink-600',
+  'bg-teal-700',
+  'bg-indigo-500',
+  'bg-lime-700',
+  'bg-fuchsia-700',
 ]
 
 /** 투표자 순번별 고정 색 */
 export const voterColor = (order: number) => PALETTE[order % PALETTE.length]
 
+/** 이름 첫 글자 원형 아바타 */
+export function VoterAvatar({ name, order, className }: { name: string; order: number; className?: string }) {
+  return (
+    <span
+      aria-hidden
+      className={cn(
+        'flex size-6 shrink-0 items-center justify-center rounded-full text-[0.6875rem] font-semibold text-white',
+        voterColor(order),
+        className,
+      )}
+    >
+      {Array.from(name)[0]}
+    </span>
+  )
+}
+
+/** 아바타 + 이름 */
 export function VoterChip({ name, order, className }: { name: string; order: number; className?: string }) {
   return (
-    <span className={cn('inline-flex h-7 items-center rounded-full px-2.5 text-sub font-semibold', voterColor(order), className)}>
+    <span className={cn('inline-flex items-center gap-2 text-sub text-gray-900', className)}>
+      <VoterAvatar name={name} order={order} className="size-5 text-[0.625rem]" />
       {name}
     </span>
   )

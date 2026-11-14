@@ -5,7 +5,7 @@ type Item = { meeting: Meeting; status: DisplayStatus; responseCount: number; co
 
 export function MeetingGallery({ items }: { items: Item[] }) {
   return (
-    <ul className="divide-y divide-gray-100">
+    <ul className="divide-y divide-gray-200 border-b border-gray-200">
       {items.map(({ meeting, status, responseCount, confirmedDate }) => (
         <li key={meeting.id}>
           <MeetingCard meeting={meeting} status={status} responseCount={responseCount} confirmedDate={confirmedDate} />

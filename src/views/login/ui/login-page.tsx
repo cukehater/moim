@@ -8,9 +8,9 @@ export function LoginPage({ searchParams }: PageProps<'/login'>) {
       <div className="flex flex-col items-center gap-3 text-center">
         <h1>
           {/* eslint-disable-next-line @next/next/no-img-element -- 정적 SVG 로고 */}
-          <img src="/logo.svg" alt="MOIM" width={316} height={100} className="h-14 w-auto" />
+          <img src="/logo.svg" alt="MOIM" width={316} height={100} className="h-9 w-auto" />
         </h1>
-        <p className="mt-1 text-body text-gray-500">참석 여부, 한 번에 모아요</p>
+        <p className="text-sub text-gray-600">참석 여부, 한 번에 모아요</p>
       </div>
       <div className="mt-auto flex flex-col gap-3">
         <Suspense>
@@ -31,7 +31,7 @@ async function LoginError({ searchParams }: Pick<PageProps<'/login'>, 'searchPar
   const { error } = await searchParams
   if (!error) return null
   return (
-    <p role="alert" className="rounded-xl bg-white px-4 py-3 text-center text-sub text-destructive">
+    <p role="alert" className="text-center text-sub text-destructive">
       {error === 'AccessDenied' ? '운영자 계정만 로그인할 수 있어요' : '로그인하지 못했어요. 다시 시도해 주세요'}
     </p>
   )

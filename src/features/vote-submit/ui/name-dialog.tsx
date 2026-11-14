@@ -25,7 +25,7 @@ type Props = {
 export function NameDialog({ open, onOpenChange, defaultName, serverError, onConfirm }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-w-[18.5rem]">
         {/* 열 때마다 입력값·에러 초기화 */}
         {open && <NameForm defaultName={defaultName} serverError={serverError} onConfirm={onConfirm} />}
       </DialogContent>
@@ -60,7 +60,7 @@ function NameForm({ defaultName, serverError, onConfirm }: Omit<Props, 'open' | 
       <div className="flex flex-col gap-2">
         <Input
           autoFocus
-          className="bg-gray-100"
+          className="text-input-safe"
           aria-label="이름"
           aria-invalid={!!error}
           aria-describedby={error ? 'voter-name-error' : undefined}

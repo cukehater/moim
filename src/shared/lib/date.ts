@@ -21,6 +21,15 @@ export const toKstInput = (d: Date) => format(new TZDate(d, TZ), "yyyy-MM-dd'T'H
 // 한국은 DST가 없어 +09:00 고정 오프셋으로 충분
 export const fromKstInput = (value: string) => new Date(`${value}:00+09:00`)
 
+/** 약속일 'yyyy-MM-dd'까지 KST 달력 기준 → 'D-3' · 'D-DAY', 지났으면 null */
+export function formatDday(day: string, now: Date) {
+  const today = format(new TZDate(now, TZ), 'yyyy-MM-dd')
+  // 둘 다 UTC 자정으로 파싱되어 정확히 하루 단위로 나뉨
+  const diff = (Date.parse(day) - Date.parse(today)) / 86_400_000
+  if (diff < 0) return null
+  return diff === 0 ? 'D-DAY' : `D-${diff}`
+}
+
 export function formatRemaining(end: Date, now: Date) {
   const minutes = differenceInMinutes(end, now)
   if (minutes >= 60 * 24) return `${Math.floor(minutes / (60 * 24))}일 남았어요`
