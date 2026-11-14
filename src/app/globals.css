@@ -109,6 +109,15 @@
   box-shadow: inset 0 1px 0 var(--color-gray-200);
 }
 
+/* 마우스 같은 정밀 포인터에서만 호버. 일부 안드로이드·인앱 웹뷰는 터치인데도 hover를 지원한다고 보고해 탭한 줄에 호버가 남음 */
+@custom-variant mouse-hover {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      @slot;
+    }
+  }
+}
+
 @utility tabular {
   font-variant-numeric: tabular-nums;
 }

@@ -33,7 +33,7 @@ export function ThumbnailUpload({ value, onChange }: Props) {
             sources: ['local', 'camera'],
             resourceType: 'image',
             clientAllowedFormats: ['jpg', 'jpeg', 'png', 'webp', 'heic'],
-            maxFileSize: 10_000_000,
+            maxFileSize: 1_000_000, // 1MB
             cropping: true,
             croppingAspectRatio: 1200 / 630,
             showSkipCropButton: false,
@@ -54,6 +54,7 @@ export function ThumbnailUpload({ value, onChange }: Props) {
             </Button>
           )}
         </CldUploadWidget>
+        <p className="pt-1.5 text-caption text-gray-600">1MB 이하 이미지만 올릴 수 있어요.</p>
       </div>
     </div>
   )

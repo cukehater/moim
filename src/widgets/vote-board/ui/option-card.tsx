@@ -32,11 +32,11 @@ export function OptionCard({ option, selected = false, multiple = true, classNam
   const interactive = !!props.onClick
   const voters = option.voters ?? []
   return (
-    // 호버·눌림 배경은 줄 전체에: 버튼과 투표자 시트 영역으로 쪼개져 보이지 않게
+    // 호버 배경은 줄 전체에(버튼·시트 영역으로 쪼개지지 않게), 마우스에서만: 터치 기기에선 탭한 줄에 회색이 남아 선택된 것처럼 보임
     <div
       className={cn(
         'flex items-stretch transition-colors duration-100',
-        selected ? 'bg-brand-50' : interactive && 'hover:bg-gray-50 has-[>button:active]:bg-gray-100',
+        selected ? 'bg-brand-50' : interactive && 'mouse-hover:bg-gray-50',
       )}
     >
       <button

@@ -30,7 +30,7 @@ export function VotersSheet({ dateLabel, voters }: Props) {
             </span>
           )}
         </span>
-        <ChevronRight className="size-4 text-gray-400 transition-colors group-hover/voters:text-gray-700" aria-hidden />
+        <ChevronRight className="size-4 text-gray-400 transition-colors group-hover/voters:text-gray-700 [@media(pointer:coarse)]:group-hover/voters:text-gray-400" aria-hidden />
         <span className="sr-only">{dateLabel} 투표자 {voters.length}명 보기</span>
       </DialogTrigger>
       <DialogContent
