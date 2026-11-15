@@ -33,7 +33,13 @@ export function ThumbnailUpload({ value, onChange }: Props) {
             sources: ['local', 'camera'],
             resourceType: 'image',
             clientAllowedFormats: ['jpg', 'jpeg', 'png', 'webp', 'heic'],
-            maxFileSize: 1_000_000, // 1MB
+            // 큰 사진도 받음: 프리셋(c_crop,g_custom/c_limit,w_1600,h_1600,q_auto:good + webp)이
+            // 저장 전에 자른 영역만 남기고 긴 변 1600px·webp로 줄임 (보통 수백 KB)
+            uploadPreset: 'moim_thumbnail',
+            maxFileSize: 10_000_000, // Cloudinary 무료 플랜 이미지 한도
+            // 업로드 전에 브라우저에서 먼저 줄임: 모바일 업로드량 감소, 무료 플랜 해상도 한도(약 25MP) 회피
+            maxImageWidth: 2400,
+            maxImageHeight: 2400,
             cropping: true,
             croppingAspectRatio: 1200 / 630,
             showSkipCropButton: false,
@@ -54,7 +60,7 @@ export function ThumbnailUpload({ value, onChange }: Props) {
             </Button>
           )}
         </CldUploadWidget>
-        <p className="pt-1.5 text-caption text-gray-600">1MB 이하 이미지만 올릴 수 있어요.</p>
+        <p className="pt-1.5 text-caption text-gray-600">10MB 이하 사진은 자동으로 가볍게 바꿔서 올려요.</p>
       </div>
     </div>
   )

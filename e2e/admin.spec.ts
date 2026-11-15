@@ -10,7 +10,8 @@ test.describe('로그인', () => {
 
   test('운영자가 아닌 계정은 거부 안내', async ({ page }) => {
     await page.goto('/login?error=AccessDenied')
-    await expect(page.getByRole('alert')).toHaveText('운영자 계정만 로그인할 수 있어요')
+    // Next 라우트 안내(__next-route-announcer__)도 role=alert라 문구로 좁힘
+    await expect(page.getByRole('alert').filter({ hasText: '운영자' })).toHaveText('운영자 계정만 로그인할 수 있어요')
   })
 })
 
