@@ -26,7 +26,9 @@ export async function submitVote(
   if (!selection.success) return { ok: false, message: selection.error.issues[0].message }
   const optionIds = selection.data
   if (!optionIds.every((id) => meeting.options.some((o) => o.id === id))) {
-    return { ok: false, message: '후보 날짜가 아니에요' }
+    // 페이지를 연 사이 운영자가 후보 날짜를 바꾼 경우: 화면을 갱신해 지워진 날짜를 걷어냄
+    revalidateMeeting(meetingId)
+    return { ok: false, message: '후보 날짜가 바뀌었어요. 다시 골라 주세요' }
   }
 
   let name: string | undefined
@@ -70,7 +72,10 @@ export async function submitVote(
     if (String((e as { cause?: unknown }).cause ?? e).includes('votes_meeting_id_name_unique')) {
       return { ok: false, fieldErrors: { name: [NAME_TAKEN] } }
     }
-    throw e
+    // 저장 도중 후보 날짜가 지워지는 등 경합: 에러 화면 대신 다시 시도 안내 (화면도 갱신)
+    console.error(e)
+    revalidateMeeting(meetingId)
+    return { ok: false, message: '투표하지 못했어요. 다시 시도해 주세요' }
   }
 
   revalidateMeeting(meetingId)

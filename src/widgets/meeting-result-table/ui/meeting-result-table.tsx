@@ -2,7 +2,7 @@ import { Check } from 'lucide-react'
 import type { Tally, VoteRecord } from '@/entities/vote/index.server'
 import { ConfirmDateButton } from '@/features/meeting-confirm-date'
 import { cn, dayParts, formatDateTime } from '@/shared/lib'
-import { VoteRecordsSheet, type VoteRow } from './vote-records-sheet'
+import { VOTER_SLOT, VoteRecordsSheet, type VoteRow } from './vote-records-sheet'
 
 type Props = {
   meetingId: string
@@ -26,7 +26,7 @@ export function MeetingResultTable({ meetingId, options, tallies, confirmation, 
     order: v.order,
     time: formatDateTime(v.createdAt),
     // 투표 완료 팝업과 같은 '1월 9일(토)' 표기
-    dates: rows.filter((r) => v.optionIds.includes(r.id)).map((r) => `${r.label}(${r.weekday})`),
+    dates: rows.filter((r) => v.optionIds.includes(r.id)).map((r) => `${r.label} (${r.weekday})`),
     optionIds: v.optionIds,
   }))
   const max = Math.max(0, ...rows.map((r) => r.count))
@@ -39,45 +39,67 @@ export function MeetingResultTable({ meetingId, options, tallies, confirmation, 
         const auto = confirmed && confirmation.tied.length === 0
         const voters = voteRows.filter((v) => v.optionIds.includes(row.id))
         return (
-          <li key={row.id} className={cn('flex flex-col gap-2 px-3.5 py-3', confirmed && 'bg-brand-50')}>
-            <div className="flex items-center gap-2">
-              <span className="text-body font-medium">
-                {row.label}
+          <li key={row.id} className={cn('flex flex-col', confirmed && 'bg-brand-50')}>
+            {/* 투표 페이지 OptionCard와 같은 배치: 날짜(요일) · 막대 · 인원 · 투표자 칸 */}
+            <div className="flex min-h-12 items-stretch">
+              <div className="flex min-w-0 flex-1 items-center gap-3 pr-2 pl-3.5">
+                <span className="flex min-w-0 flex-1 items-center gap-1.5 text-body font-medium">
+                  <span className="truncate">
+                    {row.label}
+                    <span
+                      className={cn(
+                        'ml-1 text-sub font-normal',
+                        row.dow === 0 ? 'text-sun' : row.dow === 6 ? 'text-sat' : 'text-gray-600',
+                      )}
+                    >
+                      ({row.weekday})
+                    </span>
+                  </span>
+                  {/* 확정은 글자 뱃지 대신 체크 하나 (자동·수동 구분은 스크린 리더 이름으로) */}
+                  {confirmed && (
+                    <span
+                      role="img"
+                      aria-label={auto ? '자동 확정' : '확정'}
+                      className="flex size-4 shrink-0 items-center justify-center rounded-full bg-brand text-white"
+                    >
+                      <Check className="size-2.5" strokeWidth={3.5} aria-hidden />
+                    </span>
+                  )}
+                </span>
+                <span aria-hidden className={cn('h-1 w-8 shrink-0 overflow-hidden rounded-full bg-gray-200', !row.count && 'invisible')}>
+                  <span
+                    className={cn('bar-grow block h-full rounded-full', top ? 'bg-brand' : 'bg-gray-400')}
+                    style={{ width: max ? `${(row.count / max) * 100}%` : 0 }}
+                  />
+                </span>
                 <span
                   className={cn(
-                    'ml-1.5 text-sub font-normal',
-                    row.dow === 0 ? 'text-sun' : row.dow === 6 ? 'text-sat' : 'text-gray-600',
+                    'w-7 shrink-0 text-right text-sub font-medium tabular',
+                    row.count ? 'text-gray-700' : 'text-gray-400',
                   )}
                 >
-                  {row.weekday}요일
+                  {row.count}명
                 </span>
-              </span>
-              {confirmed && (
-                <span className="flex items-center gap-1 rounded-sm bg-brand px-1.5 py-0.5 text-caption font-medium text-white">
-                  <Check className="size-3" strokeWidth={3} aria-hidden />
-                  {auto ? '자동 확정' : '확정'}
-                </span>
-              )}
-              <span aria-hidden className="ml-auto h-1 w-12 overflow-hidden rounded-full bg-gray-200">
-                <span
-                  className={cn('bar-grow block h-full rounded-full', top ? 'bg-brand' : 'bg-gray-400')}
-                  style={{ width: max ? `${(row.count / max) * 100}%` : 0 }}
-                />
-              </span>
-              <span className={cn('w-8 text-right text-sub tabular', top ? 'font-semibold text-gray-900' : 'text-gray-600')}>
-                {row.count}명
-              </span>
-              {voters.length > 0 && (
+              </div>
+              {voters.length > 0 ? (
                 <VoteRecordsSheet
                   meetingId={meetingId}
-                  dateLabel={`${row.label} ${row.weekday}요일`}
+                  dateLabel={`${row.label} (${row.weekday})`}
                   rows={voters}
                   isClosed={isClosed}
                 />
+              ) : (
+                records && (
+                  // 시트 버튼과 같은 폭의 빈칸: 막대·인원 세로 정렬 유지
+                  <span aria-hidden className="flex shrink-0 items-center gap-0.5 pr-3 pl-1">
+                    <span className={VOTER_SLOT} />
+                    <span className="size-4" />
+                  </span>
+                )
               )}
             </div>
             {confirmation?.tied.includes(row.id) && (
-              <div className="flex justify-end">
+              <div className="flex justify-end px-3.5 pb-3">
                 <ConfirmDateButton meetingId={meetingId} optionId={row.id} isConfirmed={confirmed} />
               </div>
             )}

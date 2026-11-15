@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { PREFIX, seedMeeting } from './db'
+import { deleteOption, PREFIX, seedMeeting } from './db'
 
 const voterCookie = (value: string) => ({ name: 'voterToken', value, domain: 'localhost', path: '/' })
 
@@ -17,14 +17,14 @@ test.describe('투표 페이지', () => {
 
     await page.getByRole('button', { name: '2개 날짜로 투표하기' }).click()
     const done = page.getByRole('dialog', { name: '투표했어요' })
-    await expect(done.getByText('1월 9일(토)')).toBeVisible()
+    await expect(done.getByText('1월 9일 (토)')).toBeVisible()
     await done.getByRole('button', { name: '확인' }).click()
     await expect(page.getByRole('dialog')).toHaveCount(0)
 
     // 다시 들어오면 이미 투표했다는 안내
     await page.reload()
     const again = page.getByRole('dialog', { name: '테스터님은 이미 투표했어요' })
-    await expect(again.getByText('1월 16일(토)')).toBeVisible()
+    await expect(again.getByText('1월 16일 (토)')).toBeVisible()
     await again.getByRole('button', { name: '수정할래요' }).click()
     await expect(page.getByRole('dialog')).toHaveCount(0)
     await expect(page.getByRole('checkbox', { name: /1월 9일/ })).toBeChecked()
@@ -82,13 +82,13 @@ test.describe('투표 페이지', () => {
 
     const notice = page.getByRole('dialog')
     await expect(notice.getByText('최종 날짜가 정해졌어요')).toBeVisible()
-    await expect(notice.getByText('1월 10일 일요일')).toBeVisible()
+    await expect(notice.getByText('1월 10일 (일)')).toBeVisible()
     await expect(notice.getByText(/^D-\d+$/)).toBeVisible()
 
     // 확정 안내는 닫을 수 있고, 닫아도 속성 목록에 확정 날짜가 남음
     await notice.getByRole('button', { name: '확인' }).click()
     await expect(page.getByRole('dialog')).toHaveCount(0)
-    await expect(page.getByText('1월 10일 일요일')).toBeVisible()
+    await expect(page.locator('dl').getByText('1월 10일 (일)')).toBeVisible()
   })
 
   test('마감 + 동점이면 확정 대기 안내', async ({ page }) => {
@@ -125,6 +125,20 @@ test.describe('투표 페이지', () => {
     await page.waitForTimeout(1000)
     await expect(page.getByRole('dialog')).toHaveCount(1)
     await expect(page.getByText(/이미 투표했어요/)).toHaveCount(0)
+  })
+
+  test('페이지를 연 사이 지워진 후보 날짜는 선택에서 빠지고 화면이 갱신됨', async ({ page }) => {
+    const id = `${PREFIX}vote10`
+    const { optionId } = await seedMeeting({ id, anonymous: true })
+    await page.goto(`/m/${id}`)
+    await page.getByRole('checkbox').nth(0).click()
+    await page.getByRole('checkbox').nth(1).click()
+    await deleteOption(optionId(1))
+    await page.getByRole('button', { name: /투표하기/ }).click()
+    // 첫 제출은 서버가 거부하지만 화면이 갱신돼 지워진 날짜가 사라지고, 남은 선택으로 다시 투표 가능
+    await expect(page.getByRole('checkbox')).toHaveCount(2)
+    await page.getByRole('button', { name: /투표하기/ }).click()
+    await expect(page.getByRole('dialog')).toContainText('투표했어요')
   })
 
   test('공유 미리보기 메타데이터는 모임 정보', async ({ request }) => {

@@ -1,12 +1,13 @@
 import { CalendarPlus, Plus } from 'lucide-react'
 import Link from 'next/link'
-import { Suspense, ViewTransition } from 'react'
+import { Suspense } from 'react'
 import { getDisplayStatus, getMeetingStatus, resolveConfirmation, type MeetingStatus } from '@/entities/meeting'
 import { getMeetings } from '@/entities/meeting/index.server'
 import { MeetingGallery } from '@/widgets/meeting-gallery'
 import { requireAdmin } from '@/shared/auth'
 import { cn } from '@/shared/lib'
 import { Button } from '@/shared/ui/button'
+import { PageHeader } from '@/shared/ui/page-header'
 import { PageTransition } from '@/shared/ui/page-transition'
 
 const FILTERS: { value?: MeetingStatus; label: string }[] = [
@@ -19,17 +20,19 @@ const FILTERS: { value?: MeetingStatus; label: string }[] = [
 export function DashboardPage({ searchParams }: PageProps<'/dashboard'>) {
   return (
     <PageTransition>
-      <header className="sticky top-0 z-10 flex h-13 items-center justify-between bg-white/92 px-5 backdrop-blur-md">
-        <h1>
-          {/* eslint-disable-next-line @next/next/no-img-element -- 정적 SVG 로고 */}
-          <img src="/logo.svg" alt="MOIM" width={316} height={100} className="h-5 w-auto" />
-        </h1>
-        <Button asChild size="sm" className="relative after:absolute after:-inset-y-1.5 after:inset-x-0">
-          <Link href="/dashboard/new" transitionTypes={['nav-forward']}>
-            <Plus aria-hidden />새 모임
-          </Link>
-        </Button>
-      </header>
+      <PageHeader
+        title={
+          // eslint-disable-next-line @next/next/no-img-element -- 정적 SVG 로고
+          <img src="/logo.svg" alt="MOIM" width={316} height={100} className="h-4.5 w-auto" />
+        }
+        action={
+          <Button asChild className="relative h-9 px-3.5 after:absolute after:-inset-y-1 after:inset-x-0">
+            <Link href="/dashboard/new" transitionTypes={['nav-forward']}>
+              <Plus aria-hidden />새 모임
+            </Link>
+          </Button>
+        }
+      />
       <main className="pb-16">
         <Suspense fallback={<p className="py-16 text-center text-sub text-gray-600">불러오는 중…</p>}>
           <DashboardContent searchParams={searchParams} />
@@ -72,7 +75,7 @@ async function DashboardContent({ searchParams }: Pick<PageProps<'/dashboard'>, 
 
   return (
     <>
-      <nav aria-label="상태 필터" className="flex gap-1 overflow-x-auto border-b border-gray-200 px-4 pb-3">
+      <nav aria-label="상태 필터" className="flex gap-1 overflow-x-auto border-b border-gray-200 px-4 py-3">
         {FILTERS.map((f) => {
           const active = f === current
           return (
@@ -82,17 +85,11 @@ async function DashboardContent({ searchParams }: Pick<PageProps<'/dashboard'>, 
               aria-current={active ? 'page' : undefined}
               className={cn(
                 // 보이는 높이 32px, 누르는 영역은 44px
-                'relative flex h-8 shrink-0 items-center rounded-full px-3 text-sub font-medium transition-colors after:absolute after:inset-x-0 after:-inset-y-1.5',
-                active ? 'text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                'relative flex h-8 shrink-0 items-center rounded-md px-3 text-sub font-medium transition-colors after:absolute after:inset-x-0 after:-inset-y-1.5',
+                active ? 'bg-brand-50 text-brand-600' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
               )}
             >
-              {/* 고른 칸 알약은 하나뿐: 필터를 바꾸면 새 칸으로 미끄러져 감 */}
-              {active && (
-                <ViewTransition name="filter-pill" share="pill" default="none">
-                  <span aria-hidden className="absolute inset-0 rounded-full border border-gray-200 bg-gray-100" />
-                </ViewTransition>
-              )}
-              <span className="relative">{f.label}</span>
+              {f.label}
             </Link>
           )
         })}

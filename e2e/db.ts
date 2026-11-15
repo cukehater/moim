@@ -17,6 +17,8 @@ type Seed = {
   votes?: [string, number[]][]
   dates?: string[]
   description?: string
+  startsAt?: Date
+  endsAt?: Date
 }
 
 export async function seedMeeting({
@@ -28,12 +30,14 @@ export async function seedMeeting({
   votes = [],
   dates = ['2027-01-09', '2027-01-10', '2027-01-16'],
   description,
+  startsAt,
+  endsAt,
 }: Seed) {
   const now = Date.now()
   await sql`delete from meetings where id = ${id}`
   await sql`insert into meetings (id, title, host, location, description, is_anonymous, allow_multiple, result_visibility, starts_at, ends_at, closed_at)
     values (${id}, ${title}, '모임장', '강남역', ${description ?? null}, ${anonymous}, ${multiple}, 'always',
-      ${new Date(now - DAY)}, ${new Date(now + 3 * DAY)}, ${closed ? new Date(now - 1000) : null})`
+      ${startsAt ?? new Date(now - DAY)}, ${endsAt ?? new Date(now + 3 * DAY)}, ${closed ? new Date(now - 1000) : null})`
   for (const [i, d] of dates.entries()) {
     await sql`insert into date_options (id, meeting_id, date) values (${`${id}o${i}`}, ${id}, ${d})`
   }
@@ -63,4 +67,13 @@ export async function adminSessionCookie() {
     salt: 'authjs.session-token',
   })
   return { name: 'authjs.session-token', value, domain: 'localhost', path: '/' }
+}
+
+export async function countVotes(meetingId: string) {
+  const [{ n }] = await sql`select count(*)::int n from votes where meeting_id = ${meetingId}`
+  return n as number
+}
+
+export async function deleteOption(optionId: string) {
+  await sql`delete from date_options where id = ${optionId}`
 }

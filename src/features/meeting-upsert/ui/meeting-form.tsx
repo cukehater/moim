@@ -10,8 +10,8 @@ import { useRouter } from 'next/navigation'
 import { type ReactNode, useState, useTransition } from 'react'
 import { Controller, type Path, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { meetingInputSchema, type MeetingInput } from '@/entities/meeting'
-import { formatDay } from '@/shared/lib'
+import { meetingInputSchema, PERIOD_MESSAGES, type MeetingInput, type MeetingStatus } from '@/entities/meeting'
+import { cn, formatDay } from '@/shared/lib'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -35,6 +35,10 @@ type Props = {
   meetingId: string | null
   defaultValues: MeetingInput
   hasVotes: boolean
+  /** 수정 중인 모임의 현재 상태 (생성은 null). 상태는 조기 마감·투표 재개로만 바뀌므로 기간 입력을 잠금 */
+  status: MeetingStatus | null
+  /** 서버 기준 지금 (KST 입력값): 종료 입력 min */
+  nowInput: string
   renderThumbnail: (field: { value: string | null; onChange: (v: string | null) => void }) => ReactNode
 }
 
@@ -44,7 +48,7 @@ const VISIBILITY = [
   { value: 'after_close', label: '마감 후 공개' },
 ] as const
 
-export function MeetingForm({ meetingId, defaultValues, hasVotes, renderThumbnail }: Props) {
+export function MeetingForm({ meetingId, defaultValues, hasVotes, status, nowInput, renderThumbnail }: Props) {
   const router = useRouter()
   const [pending, startTransition] = useTransition()
   // 투표가 있는 모임 수정 시 경고 확인 대기 중인 값
@@ -54,6 +58,14 @@ export function MeetingForm({ meetingId, defaultValues, hasVotes, renderThumbnai
   const err = (name: keyof MeetingInput) => formState.errors[name]?.message
   // 익명으로 받은 투표가 있으면 기명 전환 금지 (서버에서도 막음)
   const anonymousLocked = !!meetingId && hasVotes && defaultValues.isAnonymous
+  // 투표가 있으면 한 날짜만으로 바꾸기 금지 (서버에서도 막음)
+  const multipleLocked = !!meetingId && hasVotes && defaultValues.allowMultiple
+  // 마감된 모임은 후보 날짜 잠금 (서버에서도 막음)
+  const datesLocked = status === 'closed'
+  // 서버(periodErrors)와 같은 규칙: 마감은 기간 전체, 진행 중은 시작만 잠금
+  const startLocked = status === 'closed' || status === 'open'
+  const endLocked = status === 'closed'
+  const periodNote = status === 'closed' ? PERIOD_MESSAGES.CLOSED_LOCK : status === 'open' ? PERIOD_MESSAGES.START_LOCK : undefined
 
   const save = (values: MeetingInput) =>
     startTransition(async () => {
@@ -76,6 +88,8 @@ export function MeetingForm({ meetingId, defaultValues, hasVotes, renderThumbnai
         w.push('삭제한 후보 날짜에 들어온 투표는 함께 지워져요.')
       if (!defaultValues.isAnonymous && values.isAnonymous)
         w.push('익명으로 바꾸면 투표자 이름이 숨겨져요. 이름 데이터는 보존돼요.')
+      if (defaultValues.resultVisibility !== values.resultVisibility)
+        w.push('결과 공개 시점을 바꾸면 이미 투표한 사람이 알던 것과 달라져요.')
     }
     if (w.length) return setConfirming({ values, warnings: w })
     save(values)
@@ -121,7 +135,13 @@ export function MeetingForm({ meetingId, defaultValues, hasVotes, renderThumbnai
             label="후보 날짜"
             footer={
               field.value.length > 0 ? (
-                <SelectedDates dates={field.value} onRemove={(d) => field.onChange(field.value.filter((v) => v !== d))} />
+                <>
+                  <SelectedDates
+                    dates={field.value}
+                    onRemove={datesLocked ? undefined : (d) => field.onChange(field.value.filter((v) => v !== d))}
+                  />
+                  {datesLocked && <p className="pt-2">마감된 모임은 후보 날짜를 바꿀 수 없어요. 투표 재개를 이용해 주세요</p>}
+                </>
               ) : (
                 '달력에서 날짜를 눌러 고르세요.'
               )
@@ -133,8 +153,8 @@ export function MeetingForm({ meetingId, defaultValues, hasVotes, renderThumbnai
                 mode="multiple"
                 locale={ko}
                 selected={field.value.map((d) => parseISO(d))}
-                // 지난 날짜는 후보로 고를 수 없음
-                disabled={{ before: startOfToday() }}
+                // 지난 날짜는 후보로 고를 수 없음, 마감된 모임은 전부 잠금
+                disabled={datesLocked ? true : { before: startOfToday() }}
                 showOutsideDays={false}
                 onSelect={(days) => field.onChange((days ?? []).map((d) => format(d, 'yyyy-MM-dd')).sort())}
                 className="mx-auto w-full bg-transparent p-1 [--cell-size:2.25rem]"
@@ -144,23 +164,40 @@ export function MeetingForm({ meetingId, defaultValues, hasVotes, renderThumbnai
         )}
       />
 
-      <Group label="투표 기간" errors={[err('startsAt'), err('endsAt')]}>
+      <Group label="투표 기간" footer={periodNote} errors={[err('startsAt'), err('endsAt')]}>
         <Row label="시작" htmlFor="startsAt">
-          <Input id="startsAt" type="datetime-local" className={DATE_INPUT} {...register('startsAt')} />
+          <Input
+            id="startsAt"
+            type="datetime-local"
+            readOnly={startLocked}
+            className={cn(DATE_INPUT, startLocked && DATE_LOCKED)}
+            {...register('startsAt')}
+          />
         </Row>
         <Row label="종료" htmlFor="endsAt">
-          <Input id="endsAt" type="datetime-local" className={DATE_INPUT} aria-invalid={!!err('endsAt')} {...register('endsAt')} />
+          <Input
+            id="endsAt"
+            type="datetime-local"
+            readOnly={endLocked}
+            min={endLocked ? undefined : nowInput}
+            className={cn(DATE_INPUT, endLocked && DATE_LOCKED)}
+            aria-invalid={!!err('endsAt')}
+            {...register('endsAt')}
+          />
         </Row>
       </Group>
 
       <Group
         label="투표 방식"
         footer={
-          anonymousLocked
-            ? '익명으로 투표가 들어와서 기명으로 바꿀 수 없어요.'
-            : '익명이면 이름을 묻지 않아요. 여러 날짜를 끄면 하루만 고를 수 있어요.'
+          [
+            anonymousLocked && '익명으로 투표가 들어와서 기명으로 바꿀 수 없어요.',
+            multipleLocked && '투표가 들어와서 한 날짜만으로 바꿀 수 없어요.',
+          ]
+            .filter(Boolean)
+            .join(' ') || '익명이면 이름을 묻지 않아요. 여러 날짜를 끄면 하루만 고를 수 있어요.'
         }
-        errors={[err('isAnonymous')]}
+        errors={[err('isAnonymous'), err('allowMultiple')]}
       >
         <Controller
           control={control}
@@ -181,7 +218,12 @@ export function MeetingForm({ meetingId, defaultValues, hasVotes, renderThumbnai
           name="allowMultiple"
           render={({ field }) => (
             <Row label="여러 날짜 선택" htmlFor="allowMultiple">
-              <Switch id="allowMultiple" checked={field.value} onCheckedChange={field.onChange} />
+              <Switch
+                id="allowMultiple"
+                checked={field.value}
+                onCheckedChange={field.onChange}
+                disabled={multipleLocked}
+              />
             </Row>
           )}
         />
@@ -240,6 +282,8 @@ export function MeetingForm({ meetingId, defaultValues, hasVotes, renderThumbnai
 }
 
 const DATE_INPUT = 'h-9 w-auto rounded-md border-0 bg-gray-100 px-2.5 text-right shadow-none'
+// readOnly: 제출값은 유지(disabled는 react-hook-form에서 값이 빠짐), 눌러도 바뀌지 않음을 회색으로
+const DATE_LOCKED = 'pointer-events-none bg-transparent text-gray-500'
 
 /** 섹션: 머리말 + 테두리 묶음(boxed) 또는 쌓인 인풋 + 꼬리말/에러 */
 function Group(props: {
@@ -265,27 +309,30 @@ function Group(props: {
 }
 
 /** 고른 후보 날짜: 개수 + 하나씩 뺄 수 있는 칩 */
-function SelectedDates({ dates, onRemove }: { dates: string[]; onRemove: (date: string) => void }) {
+function SelectedDates({ dates, onRemove }: { dates: string[]; onRemove?: (date: string) => void }) {
   return (
     <>
       <p className="pb-2">
         <b className="font-semibold text-gray-900 tabular">{dates.length}개</b> 골랐어요
       </p>
-      <ul className="grid grid-cols-4 gap-1.5">
+      <ul className="flex flex-wrap gap-1.5">
         {dates.map((d) => (
           <li
             key={d}
-            className="flex h-7 items-center justify-between rounded-md bg-gray-100 pr-1 pl-2 text-caption font-medium text-gray-900 tabular"
+            className="flex h-7 items-center gap-1 rounded-md whitespace-nowrap bg-gray-100 pr-1 pl-2 text-caption font-medium text-gray-900 tabular"
           >
             {formatDay(d)}
-            <button
-              type="button"
-              aria-label={`${formatDay(d)} 빼기`}
-              onClick={() => onRemove(d)}
-              className="relative flex size-5 items-center justify-center rounded text-gray-500 after:absolute after:-inset-2 hover:bg-gray-200 hover:text-gray-900"
-            >
-              <X className="size-3" strokeWidth={2.5} aria-hidden />
-            </button>
+            {/* 마감된 모임은 빼기 버튼 없음 */}
+            {onRemove && (
+              <button
+                type="button"
+                aria-label={`${formatDay(d)} 빼기`}
+                onClick={() => onRemove(d)}
+                className="relative flex size-5 items-center justify-center rounded text-gray-500 after:absolute after:-inset-2 hover:bg-gray-200 hover:text-gray-900"
+              >
+                <X className="size-3" strokeWidth={2.5} aria-hidden />
+              </button>
+            )}
           </li>
         ))}
       </ul>

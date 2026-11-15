@@ -29,7 +29,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
           icon: "flex shrink-0 items-center",
           title: "text-sub font-medium",
           description: "text-caption text-white/70",
-          actionButton: "ml-auto shrink-0 rounded-full bg-white/15 px-3 py-1 text-caption font-semibold",
+          actionButton: "ml-auto shrink-0 rounded-md bg-white/15 px-3 py-1 text-caption font-semibold",
         },
       }}
       {...props}

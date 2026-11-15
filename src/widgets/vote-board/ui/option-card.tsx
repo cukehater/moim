@@ -108,7 +108,7 @@ export function OptionCard({ option, selected = false, multiple = true, classNam
         )}
       </button>
       {voters.length > 0 ? (
-        <VotersSheet dateLabel={`${option.label}(${option.weekday})`} voters={voters} />
+        <VotersSheet dateLabel={`${option.label} (${option.weekday})`} voters={voters} />
       ) : (
         option.voters && (
           // 시트 버튼과 같은 구조의 빈칸

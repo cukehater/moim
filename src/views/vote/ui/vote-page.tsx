@@ -8,6 +8,7 @@ import { StatusOverlay } from '@/widgets/status-overlay'
 import { OptionList, VoteBoard, type VoteOption } from '@/widgets/vote-board'
 import { dayParts, formatDateTime, formatDday, formatRemaining, mapHref } from '@/shared/lib'
 import { DdayBadge } from '@/shared/ui/dday-badge'
+import { PageHeader } from '@/shared/ui/page-header'
 import { getVoterToken } from '@/shared/lib/voter-token'
 import { Thumbnail } from '@/shared/ui/thumbnail'
 
@@ -50,10 +51,13 @@ async function Vote({ params }: Pick<PageProps<'/m/[id]'>, 'params'>) {
 
   return (
     <>
-      <header className="flex h-12 items-center px-5">
-        {/* eslint-disable-next-line @next/next/no-img-element -- 정적 SVG 로고 */}
-        <img src="/logo.svg" alt="MOIM" width={316} height={100} className="h-4 w-auto" />
-      </header>
+      <PageHeader
+        heading={false}
+        title={
+          // eslint-disable-next-line @next/next/no-img-element -- 정적 SVG 로고
+          <img src="/logo.svg" alt="MOIM" width={316} height={100} className="h-4.5 w-auto" />
+        }
+      />
       {/* 노션 페이지 커버: 사진은 화면 폭 꽉 채움, 없으면 생략 */}
       {meeting.thumbnailId && (
         <Thumbnail
@@ -89,7 +93,7 @@ async function Vote({ params }: Pick<PageProps<'/m/[id]'>, 'params'>) {
             {confirmedParts && (
               <Property icon={CalendarCheck} label="확정">
                 <span className="font-medium">
-                  {confirmedParts.label} {confirmedParts.weekday}요일
+                  {confirmedParts.label} ({confirmedParts.weekday})
                 </span>
                 {confirmed && formatDday(confirmed.date, now) && (
                   <DdayBadge className="ml-2">{formatDday(confirmed.date, now)!}</DdayBadge>
@@ -97,7 +101,8 @@ async function Vote({ params }: Pick<PageProps<'/m/[id]'>, 'params'>) {
               </Property>
             )}
             <Property icon={Clock} label="마감">
-              <span className="tabular">{formatDateTime(meeting.endsAt)}</span>
+              {/* 조기 마감이면 실제로 닫은 시각 (closedAt은 조기 마감에서만 기록) */}
+              <span className="tabular">{formatDateTime(meeting.closedAt ?? meeting.endsAt)}</span>
               {status === 'open' && <DdayBadge className="ml-2">{formatRemaining(meeting.endsAt, now)}</DdayBadge>}
             </Property>
           </dl>
@@ -136,7 +141,8 @@ async function Vote({ params }: Pick<PageProps<'/m/[id]'>, 'params'>) {
 
       {status === 'scheduled' && (
         <StatusOverlay
-          title={`${formatDateTime(meeting.startsAt)}에 투표가 시작돼요`}
+          title="아직 투표 전이에요"
+          highlight={`${formatDateTime(meeting.startsAt)} 시작`}
           description="시작되면 이 링크로 다시 들어와 주세요."
         />
       )}
@@ -144,7 +150,7 @@ async function Vote({ params }: Pick<PageProps<'/m/[id]'>, 'params'>) {
         (confirmedParts ? (
           <StatusOverlay
             title="최종 날짜가 정해졌어요"
-            highlight={`${confirmedParts.label} ${confirmedParts.weekday}요일`}
+            highlight={`${confirmedParts.label} (${confirmedParts.weekday})`}
             badge={confirmed && formatDday(confirmed.date, now)}
             description={meeting.location ?? undefined}
             dismissible
@@ -170,7 +176,7 @@ function Property({ icon: Icon, label, children }: { icon: LucideIcon; label: st
 
 function VoteSkeleton() {
   return (
-    <div aria-busy className="animate-pulse pt-12">
+    <div aria-busy className="animate-pulse pt-13">
       <div className="aspect-[40/21] w-full bg-gray-100" />
       <div className="mx-5 mt-6 h-7 w-2/3 rounded-md bg-gray-100" />
       <div className="mx-5 mt-5 h-20 w-1/2 rounded-md bg-gray-100" />

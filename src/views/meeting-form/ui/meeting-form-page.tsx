@@ -1,7 +1,7 @@
 import { addDays } from 'date-fns/addDays'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
-import type { MeetingInput } from '@/entities/meeting'
+import { getMeetingStatus, type MeetingInput } from '@/entities/meeting'
 import { getMeeting } from '@/entities/meeting/index.server'
 import { getTallies } from '@/entities/vote/index.server'
 import { requireAdmin } from '@/shared/auth'
@@ -38,7 +38,7 @@ async function NewMeetingForm() {
     endsAt: toKstInput(addDays(now, 7)),
     dates: [],
   }
-  return <MeetingFormClient meetingId={null} defaultValues={defaults} hasVotes={false} />
+  return <MeetingFormClient meetingId={null} defaultValues={defaults} hasVotes={false} status={null} nowInput={toKstInput(now)} />
 }
 
 export function EditMeetingPage({ params }: PageProps<'/dashboard/[id]/edit'>) {
@@ -57,6 +57,7 @@ async function EditMeetingForm({ params }: Pick<PageProps<'/dashboard/[id]/edit'
   const meeting = await getMeeting(id)
   if (!meeting) notFound()
   const { voterCount } = await getTallies(id, false)
+  const now = new Date()
   const defaults: MeetingInput = {
     title: meeting.title,
     host: meeting.host,
@@ -74,7 +75,13 @@ async function EditMeetingForm({ params }: Pick<PageProps<'/dashboard/[id]/edit'
   return (
     <>
       <PageHeader title="모임 수정" backHref={`/dashboard/${id}`} />
-      <MeetingFormClient meetingId={id} defaultValues={defaults} hasVotes={voterCount > 0} />
+      <MeetingFormClient
+        meetingId={id}
+        defaultValues={defaults}
+        hasVotes={voterCount > 0}
+        status={getMeetingStatus(meeting, now)}
+        nowInput={toKstInput(now)}
+      />
     </>
   )
 }

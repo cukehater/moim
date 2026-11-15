@@ -13,7 +13,12 @@ export async function removeVote(meetingId: string, voteId: string): Promise<Act
   if (!meeting) return { ok: false, message: '모임을 찾을 수 없어요' }
   if (meeting.isAnonymous) return { ok: false, message: '익명 모임은 투표를 지울 수 없어요' }
   // 다른 모임의 투표 id가 와도 지워지지 않게 모임 id까지 맞춤
-  await db.delete(votes).where(and(eq(votes.id, voteId), eq(votes.meetingId, meetingId)))
+  const removed = await db
+    .delete(votes)
+    .where(and(eq(votes.id, voteId), eq(votes.meetingId, meetingId)))
+    .returning({ id: votes.id })
   revalidateMeeting(meetingId)
+  // 다른 탭에서 먼저 지웠거나 다른 모임의 투표 id
+  if (!removed.length) return { ok: false, message: '이미 지워진 투표예요' }
   return { ok: true, data: undefined }
 }

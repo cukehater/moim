@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
-import type { ActionResult } from '@/shared/lib'
+import { toKstInput, type ActionResult } from '@/shared/lib'
 import { Button } from '@/shared/ui/button'
 import {
   Dialog,
@@ -32,7 +32,10 @@ export function CloseReopenButton({ meetingId, isClosed, endsAtPassed, className
         toast.success(success)
         setDialogOpen(false)
       } else {
-        setError(r.fieldErrors?.endsAt?.[0])
+        const endsAtError = r.fieldErrors?.endsAt?.[0]
+        setError(endsAtError)
+        // 상세를 연 사이 종료 시각이 지나 서버가 새 종료 시각을 요구하면 모달을 열어 오류를 보여줌
+        if (endsAtError) setDialogOpen(true)
         if (r.message) toast.error(r.message)
       }
     })
@@ -57,14 +60,31 @@ export function CloseReopenButton({ meetingId, isClosed, endsAtPassed, className
       >
         {pending && !dialogOpen ? '여는 중…' : '투표 재개'}
       </Button>
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
+      <Dialog
+        open={dialogOpen}
+        onOpenChange={(open) => {
+          setDialogOpen(open)
+          // 다시 열 때 지난 입력·오류가 남지 않게
+          if (!open) {
+            setEndsAt('')
+            setError(undefined)
+          }
+        }}
+      >
+        <DialogContent
+          // 열자마자 날짜 입력에 포커스가 가면 모바일에서 날짜 선택기가 바로 뜸: 모달 자체에 포커스
+          onOpenAutoFocus={(e) => {
+            e.preventDefault()
+            ;(e.currentTarget as HTMLElement).focus()
+          }}
+        >
           <DialogHeader>
             <DialogTitle>투표 재개</DialogTitle>
             <DialogDescription>종료 시각이 지났어요. 새 종료 시각을 정해 주세요.</DialogDescription>
           </DialogHeader>
+          {/* min-w-0: 모달이 grid라 iOS 날짜 입력의 고유 폭만큼 칸이 넓어져 모달 밖으로 밀리는 것 방지 */}
           <form
-            className="flex flex-col gap-2"
+            className="flex min-w-0 flex-col gap-2"
             onSubmit={(e) => {
               e.preventDefault()
               reopen()
@@ -74,16 +94,21 @@ export function CloseReopenButton({ meetingId, isClosed, endsAtPassed, className
             <Input
               id="reopen-ends-at"
               type="datetime-local"
-              className="bg-gray-100"
+              // iOS 사파리 네이티브 날짜 컨트롤: 기본 모양·가운데 정렬 제거 (높이는 Input의 h-10)
+              className="block appearance-none bg-gray-100 text-left [&::-webkit-date-and-time-value]:text-left"
               required
               value={endsAt}
               aria-invalid={!!error}
-              onChange={(e) => setEndsAt(e.target.value)}
+              min={toKstInput(new Date())}
+              onChange={(e) => {
+                setEndsAt(e.target.value)
+                setError(undefined)
+              }}
             />
             <FieldError message={error} />
             <DialogFooter className="mt-2">
               <Button type="submit" disabled={pending || !endsAt}>
-                재개하기
+                {pending ? '여는 중…' : '재개하기'}
               </Button>
             </DialogFooter>
           </form>

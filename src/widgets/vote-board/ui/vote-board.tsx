@@ -19,7 +19,9 @@ type Props = {
 const sameSet = (a: string[], b: string[]) => a.length === b.length && a.every((x) => b.includes(x))
 
 export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVote }: Props) {
-  const [selected, setSelected] = useState(myVote?.optionIds ?? [])
+  const [picked, setSelected] = useState(myVote?.optionIds ?? [])
+  // 갱신으로 사라진 후보 날짜는 선택에서 제외 (숨은 id가 남아 제출이 계속 거부되지 않게)
+  const selected = picked.filter((id) => options.some((o) => o.id === id))
   const [name, setName] = useState(myVote?.name ?? '')
   const [nameDialog, setNameDialog] = useState<{ pendingId?: string; error?: string } | null>(null)
   const [success, setSuccess] = useState({ open: false, title: '', dates: [] as string[] })
@@ -29,7 +31,7 @@ export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVo
   const [returning, setReturning] = useState(!!myVote)
 
   const dateLabels = (ids: string[]) =>
-    options.filter((o) => ids.includes(o.id)).map((o) => `${o.label}(${o.weekday})`)
+    options.filter((o) => ids.includes(o.id)).map((o) => `${o.label} (${o.weekday})`)
 
   const apply = (id: string) =>
     setSelected((s) => (allowMultiple ? (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]) : [id]))

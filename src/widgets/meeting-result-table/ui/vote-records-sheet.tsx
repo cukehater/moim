@@ -11,13 +11,15 @@ export type VoteRow = { id: string; name: string; order: number; time: string; d
 type Props = { meetingId: string; dateLabel: string; rows: VoteRow[]; isClosed: boolean }
 
 const FACE_LIMIT = 3
+/** 투표 페이지 VotersSheet와 같은 아바타 칸 폭 (위젯끼리 import 불가라 값만 맞춤) */
+export const VOTER_SLOT = 'w-[4.875rem]'
 
 /** 운영자용 날짜별 투표자 시트: 이름·투표 시각을 보고 중복 투표를 지움 (고른 날짜는 삭제 확인 창에서) */
 export function VoteRecordsSheet({ meetingId, dateLabel, rows, isClosed }: Props) {
   return (
     <Dialog>
-      <DialogTrigger className="group/voters -my-1 flex shrink-0 items-center gap-0.5 py-1 pl-1 active:opacity-60">
-        <span className="flex">
+      <DialogTrigger className="group/voters flex shrink-0 items-center gap-0.5 pr-3 pl-1 active:opacity-60">
+        <span className={`flex ${VOTER_SLOT} justify-end`}>
           {rows.slice(0, FACE_LIMIT).map((r) => (
             <VoterAvatar key={r.id} name={r.name} order={r.order} className="-ml-1.5 ring-2 ring-white first:ml-0" />
           ))}

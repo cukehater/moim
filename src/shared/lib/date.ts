@@ -6,14 +6,13 @@ import { ko } from 'date-fns/locale/ko'
 
 const TZ = 'Asia/Seoul'
 
-/** 'yyyy-MM-dd' → '12/20(토)' */
-export const formatDay = (day: string) => format(parseISO(day), 'M/d(EEE)', { locale: ko })
+const DAY = 'M월 d일 (EEE)'
 
-/** → '12/20(토) 19:00' (KST) */
-export const formatDateTime = (d: Date) => format(new TZDate(d, TZ), 'M/d(EEE) HH:mm', { locale: ko })
+/** 'yyyy-MM-dd' → '12월 20일 (토)' */
+export const formatDay = (day: string) => format(parseISO(day), DAY, { locale: ko })
 
-/** → '2026.12.20 19:00' (KST) */
-export const formatPeriod = (d: Date) => format(new TZDate(d, TZ), 'yyyy.MM.dd HH:mm')
+/** → '12월 20일 (토) 19:00' (KST) */
+export const formatDateTime = (d: Date) => format(new TZDate(d, TZ), `${DAY} HH:mm`, { locale: ko })
 
 /** datetime-local 입력값 (KST) */
 export const toKstInput = (d: Date) => format(new TZDate(d, TZ), "yyyy-MM-dd'T'HH:mm")

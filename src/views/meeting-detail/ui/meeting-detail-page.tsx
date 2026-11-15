@@ -56,12 +56,11 @@ async function MeetingDetail({ params }: Pick<PageProps<'/dashboard/[id]'>, 'par
         title={meeting.title}
         backHref="/dashboard"
         action={
-          // 대시보드 '새 모임'과 같은 작은 알약: 보이는 높이 32px, 누르는 영역은 위아래로 넓혀 44px. 오른쪽은 본문 여백(20px)에 맞춤
+          // 보이는 높이 36px, 누르는 영역은 위아래로 넓혀 44px
           <Button
             asChild
             variant="secondary"
-            size="sm"
-            className="relative mr-5 px-3.5 after:absolute after:-inset-y-1.5 after:inset-x-0"
+            className="relative h-9 px-3.5 after:absolute after:-inset-y-1 after:inset-x-0"
           >
             <Link href={`/dashboard/${id}/edit`} transitionTypes={['nav-forward']}>편집</Link>
           </Button>
@@ -88,7 +87,7 @@ async function MeetingDetail({ params }: Pick<PageProps<'/dashboard/[id]'>, 'par
               <StatusBadge status={displayStatus} className="text-sub" />
               {confirmedParts && (
                 <span className="ml-2 font-medium">
-                  {confirmedParts.label} {confirmedParts.weekday}요일
+                  {confirmedParts.label} ({confirmedParts.weekday})
                 </span>
               )}
               {confirmed && formatDday(confirmed.date, now) && (
@@ -110,7 +109,8 @@ async function MeetingDetail({ params }: Pick<PageProps<'/dashboard/[id]'>, 'par
             )}
             <Property label="투표 기간">
               <span className="tabular">
-                {formatDateTime(meeting.startsAt)} ~ {formatDateTime(meeting.endsAt)}
+                <span className="whitespace-nowrap">{formatDateTime(meeting.startsAt)} ~</span>{' '}
+                <span className="whitespace-nowrap">{formatDateTime(meeting.endsAt)}</span>
               </span>
             </Property>
             <Property label="방식">
@@ -133,12 +133,15 @@ async function MeetingDetail({ params }: Pick<PageProps<'/dashboard/[id]'>, 'par
               <ArrowUpRight className="text-gray-500" aria-hidden />
             </Link>
           </Button>
-          <CloseReopenButton
-            meetingId={id}
-            isClosed={status === 'closed'}
-            endsAtPassed={meeting.endsAt <= now}
-            className="col-span-2"
-          />
+          {/* 예정 모임엔 조기 마감 없음 (서버도 거부) */}
+          {status !== 'scheduled' && (
+            <CloseReopenButton
+              meetingId={id}
+              isClosed={status === 'closed'}
+              endsAtPassed={meeting.endsAt <= now}
+              className="col-span-2"
+            />
+          )}
         </div>
 
         <section>

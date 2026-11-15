@@ -2,7 +2,8 @@
 @import "tw-animate-css";
 
 @theme inline {
-  --font-sans: var(--font-pretendard), system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  /* 숫자만 Open Sans (unicode-range 0~9), 나머지는 Pretendard */
+  --font-sans: var(--font-digits), var(--font-pretendard), system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
 
   /* 타입 스케일 (390px 기준 px): 22 / 16 / 14 / 13 / 12. 촘촘한 노션·리니어 본문, 굵기는 500·600 */
   --text-title: 1.375rem;
@@ -310,20 +311,6 @@
   animation: vt-rise 420ms var(--ease-out-expo) both;
 }
 
-/* 필터 알약: 고른 칸으로 미끄러져 감 */
-::view-transition-group(.pill) {
-  animation-duration: 320ms;
-  animation-timing-function: var(--ease-out-expo);
-}
-/* 지나가는 동안 옅어져 아래 글자가 비침 */
-@keyframes pill-ghost {
-  50% {
-    opacity: 0.35;
-  }
-}
-::view-transition-image-pair(.pill) {
-  animation: pill-ghost 320ms ease-in-out;
-}
 
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*),

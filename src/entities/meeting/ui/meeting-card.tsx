@@ -1,7 +1,7 @@
 import { CalendarDays, UsersRound } from 'lucide-react'
 import Link from 'next/link'
 import { ViewTransition } from 'react'
-import { dayParts, formatDday, formatPeriod } from '@/shared/lib'
+import { dayParts, formatDateTime, formatDday } from '@/shared/lib'
 import { DdayBadge } from '@/shared/ui/dday-badge'
 import { Thumbnail } from '@/shared/ui/thumbnail'
 import type { Meeting } from '../api'
@@ -47,14 +47,15 @@ export function MeetingCard({ meeting, status, responseCount, confirmedDate }: P
             {responseCount}
           </span>
         </div>
-        <p className="truncate text-caption text-gray-600 tabular">
-          {formatPeriod(meeting.startsAt)} ~ {formatPeriod(meeting.endsAt)}
+        <p className="text-caption text-gray-600 tabular">
+          <span className="whitespace-nowrap">{formatDateTime(meeting.startsAt)} ~</span>{' '}
+          <span className="whitespace-nowrap">{formatDateTime(meeting.endsAt)}</span>
         </p>
         <p className="mt-0.5 flex items-center gap-2">
           <StatusBadge status={status} />
           {confirmed && (
             <span className="text-caption font-medium text-gray-900">
-              {confirmed.label} {confirmed.weekday}요일
+              {confirmed.label} ({confirmed.weekday})
             </span>
           )}
           {dday && <DdayBadge>{dday}</DdayBadge>}
