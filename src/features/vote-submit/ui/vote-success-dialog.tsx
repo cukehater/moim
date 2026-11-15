@@ -22,7 +22,8 @@ export function VoteSuccessDialog({ open, onOpenChange, title, dates }: Props) {
     if (!open) return
     // 투표할 때만 필요하니 첫 화면 번들에서 제외
     import('canvas-confetti').then(({ default: confetti }) => {
-      const base = { particleCount: 70, spread: 60, startVelocity: 55, colors: COLORS, disableForReducedMotion: true }
+      // 모바일 폭(≤500px) 기준: 기본 크기(scalar 1)는 입자가 커 보여 줄임
+      const base = { particleCount: 50, scalar: 0.6, spread: 60, startVelocity: 55, colors: COLORS, disableForReducedMotion: true }
       confetti({ ...base, angle: 60, origin: { x: 0, y: 0.75 } })
       confetti({ ...base, angle: 120, origin: { x: 1, y: 0.75 } })
     })

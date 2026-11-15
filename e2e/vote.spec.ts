@@ -102,6 +102,31 @@ test.describe('투표 페이지', () => {
     await expect(page.getByRole('dialog').getByRole('button', { name: '닫기' })).toHaveCount(0)
   })
 
+  test('다시 들어와 투표 취소 후 다시 투표하면 성공 모달만', async ({ page }) => {
+    const id = `${PREFIX}vote9`
+    await seedMeeting({ id, anonymous: true })
+    await page.goto(`/m/${id}`)
+    await page.getByRole('checkbox').first().click()
+    await page.getByRole('button', { name: /투표하기/ }).click()
+    await page.getByRole('dialog').getByRole('button', { name: '확인' }).click()
+
+    // 재방문: 이미 투표했어요 안내를 닫고 취소
+    await page.reload()
+    await page.getByRole('button', { name: '그대로 둘게요' }).click()
+    await page.getByRole('button', { name: '투표 취소' }).click()
+    await page.getByRole('alertdialog').getByRole('button', { name: '투표 취소' }).click()
+    await expect(page.getByRole('button', { name: '날짜를 골라 주세요' })).toBeVisible()
+
+    await page.getByRole('checkbox').first().click()
+    await page.getByRole('button', { name: /투표하기/ }).click()
+    await expect(page.getByRole('dialog')).toContainText('투표했어요')
+    // 투표 후 서버 갱신(revalidate)이 도착한 뒤에도 안내가 새로 뜨지 않아야 함
+    await page.waitForLoadState('networkidle')
+    await page.waitForTimeout(1000)
+    await expect(page.getByRole('dialog')).toHaveCount(1)
+    await expect(page.getByText(/이미 투표했어요/)).toHaveCount(0)
+  })
+
   test('공유 미리보기 메타데이터는 모임 정보', async ({ request }) => {
     const id = `${PREFIX}vote7`
     await seedMeeting({ id, title: '[E2E] 공유 모임' })
@@ -110,6 +135,15 @@ test.describe('투표 페이지', () => {
     expect(head).toContain('<meta property="og:title" content="[E2E] 공유 모임"/>')
     expect(head).toMatch(/og:description" content="모임장님의 모임 · 강남역 · .+ 마감"/)
     expect(head).toContain('og:image')
+  })
+
+  test('모임 설명이 있으면 공유 미리보기 설명은 모임 설명', async ({ request }) => {
+    const id = `${PREFIX}vote8`
+    await seedMeeting({ id, description: '집들이에 초대합니다\n\n편하게 오세요' })
+    const html = await (await request.get(`/m/${id}`, { headers: { 'user-agent': 'kakaotalk-scrap/1.0' } })).text()
+    const head = html.slice(0, html.indexOf('</head>'))
+    expect(head).toContain('<meta property="og:description" content="집들이에 초대합니다 편하게 오세요"/>')
+    expect(head).toContain('<meta name="twitter:description" content="집들이에 초대합니다 편하게 오세요"/>')
   })
 
   // 스트리밍 중(Suspense 안) notFound라 상태 코드는 200, 대신 not-found 화면 + noindex

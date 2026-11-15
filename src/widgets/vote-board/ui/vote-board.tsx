@@ -25,8 +25,8 @@ export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVo
   const [success, setSuccess] = useState({ open: false, title: '', dates: [] as string[] })
   const [pending, startTransition] = useTransition()
   const listRef = useRef<HTMLDivElement>(null)
-  // 페이지를 열 때 이미 투표한 사람만 (방금 투표해 생긴 myVote엔 안 띄움)
-  const [returning] = useState(!!myVote)
+  // 페이지를 열 때 이미 투표한 사람만. 이 페이지에서 투표·취소하면 끔: 취소 후 재투표로 myVote가 다시 생겨도 안 띄움
+  const [returning, setReturning] = useState(!!myVote)
 
   const dateLabels = (ids: string[]) =>
     options.filter((o) => ids.includes(o.id)).map((o) => `${o.label}(${o.weekday})`)
@@ -42,7 +42,10 @@ export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVo
   const submit = () =>
     startTransition(async () => {
       const r = await submitVote(meetingId, { optionIds: selected, name: isAnonymous ? undefined : name })
-      if (r.ok) return setSuccess({ open: true, title: myVote ? '투표를 수정했어요' : '투표했어요', dates: dateLabels(selected) })
+      if (r.ok) {
+        setReturning(false)
+        return setSuccess({ open: true, title: myVote ? '투표를 수정했어요' : '투표했어요', dates: dateLabels(selected) })
+      }
       const nameError = r.fieldErrors?.name?.[0]
       if (nameError) return setNameDialog({ error: nameError })
       toast.error(r.message ?? '투표하지 못했어요')
@@ -81,7 +84,10 @@ export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVo
       <div className="bottom-bar flex gap-2">
         {myVote ? (
           <>
-            <CancelVoteButton meetingId={meetingId} onCanceled={() => setSelected([])} />
+            <CancelVoteButton meetingId={meetingId} onCanceled={() => {
+              setSelected([])
+              setReturning(false)
+            }} />
             <Button size="lg" className="flex-1" disabled={pending || !dirty || selected.length === 0} onClick={submit}>
               <Check strokeWidth={2.75} aria-hidden />
               {pending ? '저장 중…' : '수정하기'}

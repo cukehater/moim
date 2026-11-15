@@ -4,7 +4,7 @@ import { getMeeting } from '@/entities/meeting/index.server'
 import { formatDateTime, formatDay } from '@/shared/lib'
 import { cldUrl, OG_RATIO } from '@/shared/ui/thumbnail'
 
-/** 링크 공유 미리보기: 모임 제목 + 모임장·장소·마감(확정 후엔 확정일) + 썸네일 */
+/** 링크 공유 미리보기: 모임 제목 + 모임 설명(없으면 모임장·장소·마감 또는 확정일) + 썸네일 */
 export async function generateVoteMetadata({ params }: PageProps<'/m/[id]'>): Promise<Metadata> {
   const { id } = await params
   const meeting = await getMeeting(id)
@@ -13,7 +13,9 @@ export async function generateVoteMetadata({ params }: PageProps<'/m/[id]'>): Pr
   const closed = getMeetingStatus(meeting, new Date()) === 'closed'
   const confirmedId = closed ? resolveConfirmation(meeting.confirmedOptionId, meeting.options).optionId : null
   const confirmed = meeting.options.find((o) => o.id === confirmedId)
-  const description = [
+  // 모임 설명이 있으면 그대로(줄바꿈은 공백 하나로), 없으면 모임장·장소·마감 요약
+  const summary = meeting.description?.replace(/\s+/g, ' ').trim()
+  const description = summary || [
     `${meeting.host}님의 모임`,
     meeting.location,
     confirmed

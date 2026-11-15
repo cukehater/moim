@@ -16,6 +16,7 @@ type Seed = {
   /** [이름, 고른 후보 인덱스[]] */
   votes?: [string, number[]][]
   dates?: string[]
+  description?: string
 }
 
 export async function seedMeeting({
@@ -26,11 +27,12 @@ export async function seedMeeting({
   multiple = true,
   votes = [],
   dates = ['2027-01-09', '2027-01-10', '2027-01-16'],
+  description,
 }: Seed) {
   const now = Date.now()
   await sql`delete from meetings where id = ${id}`
-  await sql`insert into meetings (id, title, host, location, is_anonymous, allow_multiple, result_visibility, starts_at, ends_at, closed_at)
-    values (${id}, ${title}, '모임장', '강남역', ${anonymous}, ${multiple}, 'always',
+  await sql`insert into meetings (id, title, host, location, description, is_anonymous, allow_multiple, result_visibility, starts_at, ends_at, closed_at)
+    values (${id}, ${title}, '모임장', '강남역', ${description ?? null}, ${anonymous}, ${multiple}, 'always',
       ${new Date(now - DAY)}, ${new Date(now + 3 * DAY)}, ${closed ? new Date(now - 1000) : null})`
   for (const [i, d] of dates.entries()) {
     await sql`insert into date_options (id, meeting_id, date) values (${`${id}o${i}`}, ${id}, ${d})`
