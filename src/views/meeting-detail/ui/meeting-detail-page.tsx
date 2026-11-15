@@ -56,7 +56,13 @@ async function MeetingDetail({ params }: Pick<PageProps<'/dashboard/[id]'>, 'par
         title={meeting.title}
         backHref="/dashboard"
         action={
-          <Button asChild variant="ghost" size="sm" className="h-9">
+          // 대시보드 '새 모임'과 같은 작은 알약: 보이는 높이 32px, 누르는 영역은 위아래로 넓혀 44px. 오른쪽은 본문 여백(20px)에 맞춤
+          <Button
+            asChild
+            variant="secondary"
+            size="sm"
+            className="relative mr-5 px-3.5 after:absolute after:-inset-y-1.5 after:inset-x-0"
+          >
             <Link href={`/dashboard/${id}/edit`} transitionTypes={['nav-forward']}>편집</Link>
           </Button>
         }
