@@ -85,7 +85,7 @@ export function OptionCard({ option, selected = false, multiple = true, classNam
         {option.ratio !== undefined && (
           <span
             aria-hidden
-            className={cn('h-1 w-8 shrink-0 overflow-hidden rounded-full bg-gray-200', !option.count && 'invisible')}
+            className={cn('h-1 w-12 shrink-0 overflow-hidden rounded-full bg-gray-200', !option.count && 'invisible')}
           >
             <span
               className={cn(

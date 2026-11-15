@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
-import { toKstInput, type ActionResult } from '@/shared/lib'
+import { cn, toKstInput, type ActionResult } from '@/shared/lib'
 import { Button } from '@/shared/ui/button'
 import {
   Dialog,
@@ -91,20 +91,36 @@ export function CloseReopenButton({ meetingId, isClosed, endsAtPassed, className
             }}
           >
             <Label htmlFor="reopen-ends-at">새 종료 시각</Label>
-            <Input
-              id="reopen-ends-at"
-              type="datetime-local"
-              // iOS 사파리 네이티브 날짜 컨트롤: 기본 모양·가운데 정렬 제거 (높이는 Input의 h-10)
-              className="block appearance-none bg-gray-100 text-left [&::-webkit-date-and-time-value]:text-left"
-              required
-              value={endsAt}
-              aria-invalid={!!error}
-              min={toKstInput(new Date())}
-              onChange={(e) => {
-                setEndsAt(e.target.value)
-                setError(undefined)
-              }}
-            />
+            <div className="relative">
+              <Input
+                id="reopen-ends-at"
+                type="datetime-local"
+                // iOS 사파리 네이티브 날짜 컨트롤: 기본 모양·가운데 정렬 제거.
+                // 고정 높이면 값이 위로 붙어서 위아래 여백 + 줄 높이로 높이를 만듦 (빈 값일 때도 한 줄 유지)
+                className={cn(
+                  'peer block h-auto appearance-none bg-gray-100 py-2 text-left leading-6 [&::-webkit-date-and-time-value]:min-h-6 [&::-webkit-date-and-time-value]:text-left',
+                  // 빈 값: 크롬의 '연도-월-일 --:--'를 숨겨 안내 문구와 겹치지 않게 (입력 중엔 보임)
+                  !endsAt && 'text-transparent focus:text-gray-900',
+                )}
+                required
+                value={endsAt}
+                aria-invalid={!!error}
+                min={toKstInput(new Date())}
+                onChange={(e) => {
+                  setEndsAt(e.target.value)
+                  setError(undefined)
+                }}
+              />
+              {/* iOS는 빈 날짜 입력에 아무것도 안 그림: placeholder 대신 (입력 중엔 숨김) */}
+              {!endsAt && (
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-body text-gray-400 peer-focus:hidden"
+                >
+                  날짜와 시간을 골라 주세요
+                </span>
+              )}
+            </div>
             <FieldError message={error} />
             <DialogFooter className="mt-2">
               <Button type="submit" disabled={pending || !endsAt}>

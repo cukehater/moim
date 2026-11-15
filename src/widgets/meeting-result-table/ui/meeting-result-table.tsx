@@ -66,7 +66,7 @@ export function MeetingResultTable({ meetingId, options, tallies, confirmation, 
                     </span>
                   )}
                 </span>
-                <span aria-hidden className={cn('h-1 w-8 shrink-0 overflow-hidden rounded-full bg-gray-200', !row.count && 'invisible')}>
+                <span aria-hidden className={cn('h-1 w-12 shrink-0 overflow-hidden rounded-full bg-gray-200', !row.count && 'invisible')}>
                   <span
                     className={cn('bar-grow block h-full rounded-full', top ? 'bg-brand' : 'bg-gray-400')}
                     style={{ width: max ? `${(row.count / max) * 100}%` : 0 }}
