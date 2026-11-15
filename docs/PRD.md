@@ -9,7 +9,7 @@
 ### 사용자
 | 역할 | 인증 | 접근 범위 |
 |---|---|---|
-| 운영자 | Google OAuth, `ADMIN_EMAIL` 일치 시만 허용 | `/dashboard/**` 전체 |
+| 운영자 | Google OAuth, `ADMIN_EMAIL`(쉼표로 여러 명) 중 하나와 일치 시만 허용 | `/dashboard/**` 전체 |
 | 투표자 | 없음 (httpOnly 쿠키 voterToken) | `/m/[id]` |
 
 ### 범위 밖 (v1)

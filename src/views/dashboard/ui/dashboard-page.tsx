@@ -1,4 +1,4 @@
-import { CalendarPlus, Plus } from 'lucide-react'
+import { CalendarPlus, LogOut, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { Suspense } from 'react'
 import { getDisplayStatus, getMeetingStatus, resolveConfirmation, type MeetingStatus } from '@/entities/meeting'
@@ -9,6 +9,7 @@ import { cn } from '@/shared/lib'
 import { Button } from '@/shared/ui/button'
 import { PageHeader } from '@/shared/ui/page-header'
 import { PageTransition } from '@/shared/ui/page-transition'
+import { signOutToLogin } from '../api/sign-out.action'
 
 const FILTERS: { value?: MeetingStatus; label: string }[] = [
   { label: '전체' },
@@ -26,11 +27,23 @@ export function DashboardPage({ searchParams }: PageProps<'/dashboard'>) {
           <img src="/logo.svg" alt="MOIM" width={316} height={100} className="h-4.5 w-auto" />
         }
         action={
-          <Button asChild className="relative h-9 px-3.5 after:absolute after:-inset-y-1 after:inset-x-0">
-            <Link href="/dashboard/new" transitionTypes={['nav-forward']}>
-              <Plus aria-hidden />새 모임
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <form action={signOutToLogin}>
+              <Button
+                type="submit"
+                variant="secondary"
+                className="relative h-9 gap-1 px-3 text-gray-700 after:absolute after:-inset-y-1 after:inset-x-0"
+              >
+                <LogOut className="size-3.5" strokeWidth={2} aria-hidden />
+                로그아웃
+              </Button>
+            </form>
+            <Button asChild className="relative h-9 px-3.5 after:absolute after:-inset-y-1 after:inset-x-0">
+              <Link href="/dashboard/new" transitionTypes={['nav-forward']}>
+                <Plus aria-hidden />새 모임
+              </Link>
+            </Button>
+          </div>
         }
       />
       <main className="pb-16">

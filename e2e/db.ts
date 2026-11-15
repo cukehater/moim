@@ -59,10 +59,10 @@ export async function cleanup() {
   await sql`delete from meetings where id like ${PREFIX + '%'} or title like '[E2E]%'`
 }
 
-/** 운영자(ADMIN_EMAIL) Auth.js 세션 쿠키 */
+/** 운영자(ADMIN_EMAIL 첫 번째) Auth.js 세션 쿠키 */
 export async function adminSessionCookie() {
   const value = await encode({
-    token: { email: process.env.ADMIN_EMAIL, name: 'e2e' },
+    token: { email: process.env.ADMIN_EMAIL!.split(',')[0].trim(), name: 'e2e' },
     secret: process.env.AUTH_SECRET!,
     salt: 'authjs.session-token',
   })

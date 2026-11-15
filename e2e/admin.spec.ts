@@ -33,6 +33,14 @@ test.describe('운영자', () => {
     await expect(page.getByRole('link', { name: /\[E2E\] 대시보드 모임/ })).toHaveCount(0)
   })
 
+  test('로그아웃하면 로그인 화면으로', async ({ page }) => {
+    await page.goto('/dashboard')
+    await page.getByRole('button', { name: '로그아웃' }).click()
+    await expect(page).toHaveURL(/\/login/)
+    await page.goto('/dashboard')
+    await expect(page).toHaveURL(/\/login/)
+  })
+
   test('새 모임 만들기', async ({ page }) => {
     await page.goto('/dashboard/new')
     await page.getByPlaceholder('제목 (필수)').fill('[E2E] 새 모임')
