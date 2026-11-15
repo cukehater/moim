@@ -36,3 +36,24 @@ export async function getMyVote(meetingId: string, voterToken: string) {
 }
 
 export type MyVote = NonNullable<Awaited<ReturnType<typeof getMyVote>>>
+
+/** 운영자 전용: 투표자별 투표 (id·이름·순번·시각·고른 옵션). 투표 id가 들어 있으니 투표 페이지엔 쓰지 않음 */
+export async function getVoteRecords(meetingId: string) {
+  const rows = await db
+    .select({ id: votes.id, name: votes.name, createdAt: votes.createdAt, optionId: voteSelections.optionId })
+    .from(votes)
+    .leftJoin(voteSelections, eq(voteSelections.voteId, votes.id))
+    .where(eq(votes.meetingId, meetingId))
+    .orderBy(asc(votes.createdAt))
+
+  const records = new Map<string, VoteRecord>()
+  for (const { id, name, createdAt, optionId } of rows) {
+    const r =
+      records.get(id) ??
+      records.set(id, { id, name: name ?? '(이름 없음)', order: records.size, createdAt, optionIds: [] }).get(id)!
+    if (optionId) r.optionIds.push(optionId)
+  }
+  return [...records.values()]
+}
+
+export type VoteRecord = { id: string; name: string; order: number; createdAt: Date; optionIds: string[] }

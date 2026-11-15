@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { Button } from '@/shared/ui/button'
+import { DateBadges } from '@/shared/ui/date-badges'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/shared/ui/dialog'
 
 // 브랜드 블루 + 약속 오렌지 계열
@@ -31,13 +32,7 @@ export function VoteSuccessDialog({ open, onOpenChange, title, dates }: Props) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton={false} className="max-w-[18.5rem] gap-0 px-5 pt-6 pb-6 text-center">
         <DialogTitle className="text-heading font-semibold">{title}</DialogTitle>
-        <ul className="mt-3 flex flex-wrap justify-center gap-1.5">
-          {dates.map((d) => (
-            <li key={d} className="rounded-full bg-brand-50 px-2.5 py-1 text-caption font-medium text-brand-600 tabular">
-              {d}
-            </li>
-          ))}
-        </ul>
+        <DateBadges dates={dates} className="mt-3" />
         <DialogDescription className="mt-3 text-sub text-gray-600">확정되면 이 링크에서 확인할 수 있어요.</DialogDescription>
         <Button size="lg" className="mt-5 w-full" onClick={() => onOpenChange(false)}>
           확인

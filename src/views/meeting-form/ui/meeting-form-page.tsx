@@ -7,16 +7,17 @@ import { getTallies } from '@/entities/vote/index.server'
 import { requireAdmin } from '@/shared/auth'
 import { toKstInput } from '@/shared/lib'
 import { PageHeader } from '@/shared/ui/page-header'
+import { PageTransition } from '@/shared/ui/page-transition'
 import { MeetingFormClient } from './meeting-form-client'
 
 export function NewMeetingPage() {
   return (
-    <>
+    <PageTransition>
       <PageHeader title="새 모임" backHref="/dashboard" />
       <Suspense>
         <NewMeetingForm />
       </Suspense>
-    </>
+    </PageTransition>
   )
 }
 
@@ -42,9 +43,11 @@ async function NewMeetingForm() {
 
 export function EditMeetingPage({ params }: PageProps<'/dashboard/[id]/edit'>) {
   return (
-    <Suspense>
-      <EditMeetingForm params={params} />
-    </Suspense>
+    <PageTransition>
+      <Suspense>
+        <EditMeetingForm params={params} />
+      </Suspense>
+    </PageTransition>
   )
 }
 

@@ -9,6 +9,7 @@ export function PageHeader({ title, backHref, action }: { title?: ReactNode; bac
       {backHref && (
         <Link
           href={backHref}
+          transitionTypes={['nav-back']}
           aria-label="목록으로"
           className="flex size-tap shrink-0 items-center justify-center rounded-md text-gray-600 hover:bg-gray-100 active:bg-gray-100"
         >

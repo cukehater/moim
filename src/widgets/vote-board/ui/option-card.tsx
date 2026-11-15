@@ -1,4 +1,3 @@
-import { Check } from 'lucide-react'
 import type { ComponentProps } from 'react'
 import type { Voter } from '@/entities/vote'
 import { cn } from '@/shared/lib/cn'
@@ -57,10 +56,19 @@ export function OptionCard({ option, selected = false, multiple = true, classNam
             className={cn(
               'flex size-[1.125rem] shrink-0 items-center justify-center border-[1.5px] transition-colors duration-100',
               multiple ? 'rounded-[4px]' : 'rounded-full',
-              selected ? 'border-brand bg-brand text-white' : 'border-gray-300 bg-white',
+              selected ? 'animate-[check-pop_280ms_var(--ease-out-expo)] border-brand bg-brand text-white' : 'border-gray-300 bg-white',
             )}
           >
-            {selected && <Check className="size-3" strokeWidth={3.25} />}
+            {selected && (
+              // lucide Check를 짧은 획부터 긋도록 뒤집은 경로
+              <svg viewBox="0 0 24 24" className="size-3" fill="none" stroke="currentColor" strokeWidth={3.25} strokeLinecap="round" strokeLinejoin="round">
+                <path
+                  d="M4 12l5 5L20 6"
+                  pathLength={1}
+                  className="animate-[check-draw_260ms_var(--ease-out-expo)_60ms_both] [stroke-dasharray:1]"
+                />
+              </svg>
+            )}
           </span>
         )}
         <span className="min-w-0 flex-1 truncate text-body font-medium">
@@ -81,7 +89,7 @@ export function OptionCard({ option, selected = false, multiple = true, classNam
           >
             <span
               className={cn(
-                'block h-full rounded-full transition-[width] duration-300 ease-out-expo',
+                'bar-grow block h-full rounded-full transition-[width] duration-300 ease-out-expo',
                 option.ratio === 1 && option.count ? 'bg-brand' : 'bg-gray-400',
               )}
               style={{ width: `${option.ratio * 100}%` }}

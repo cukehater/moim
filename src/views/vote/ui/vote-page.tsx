@@ -56,7 +56,13 @@ async function Vote({ params }: Pick<PageProps<'/m/[id]'>, 'params'>) {
       </header>
       {/* 노션 페이지 커버: 사진은 화면 폭 꽉 채움, 없으면 생략 */}
       {meeting.thumbnailId && (
-        <Thumbnail publicId={meeting.thumbnailId} alt="" sizes="(max-width: 500px) 100vw, 500px" priority />
+        <Thumbnail
+          publicId={meeting.thumbnailId}
+          alt=""
+          sizes="(max-width: 500px) 100vw, 500px"
+          priority
+          className="cover-parallax"
+        />
       )}
       <main className="pb-32">
         <div className="px-5 pt-5">

@@ -1,1 +1,1 @@
-export { getTallies, getMyVote, type Tally, type MyVote } from './queries'
+export { getTallies, getMyVote, getVoteRecords, type Tally, type MyVote, type VoteRecord } from './queries'

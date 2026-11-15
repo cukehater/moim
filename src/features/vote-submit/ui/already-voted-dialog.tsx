@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/shared/ui/button'
+import { DateBadges } from '@/shared/ui/date-badges'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/shared/ui/dialog'
 
 type Props = {
@@ -24,13 +25,7 @@ export function AlreadyVotedDialog({ name, dates, onEdit }: Props) {
         <DialogDescription className="mt-1.5 text-sub text-gray-600">
           마감 전까지 언제든 고칠 수 있어요.
         </DialogDescription>
-        <ul className="mt-3 flex flex-wrap justify-center gap-1.5">
-          {dates.map((d) => (
-            <li key={d} className="rounded-full bg-gray-100 px-2.5 py-1 text-caption font-medium text-gray-800 tabular">
-              {d}
-            </li>
-          ))}
-        </ul>
+        <DateBadges dates={dates} tone="gray" className="mt-3" />
         <div className="mt-5 flex gap-2">
           <Button variant="secondary" size="lg" className="flex-1" onClick={() => setOpen(false)}>
             그대로 둘게요

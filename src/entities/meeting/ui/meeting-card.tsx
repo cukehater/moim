@@ -1,5 +1,6 @@
 import { CalendarDays, UsersRound } from 'lucide-react'
 import Link from 'next/link'
+import { ViewTransition } from 'react'
 import { dayParts, formatDday, formatPeriod } from '@/shared/lib'
 import { DdayBadge } from '@/shared/ui/dday-badge'
 import { Thumbnail } from '@/shared/ui/thumbnail'
@@ -20,17 +21,20 @@ export function MeetingCard({ meeting, status, responseCount, confirmedDate }: P
   const confirmed = status === 'confirmed' && confirmedDate ? dayParts(confirmedDate) : null
   const dday = confirmed && confirmedDate ? formatDday(confirmedDate, new Date()) : null
   return (
-    <Link href={`/dashboard/${meeting.id}`} className="pressable flex gap-3 px-5 py-3">
+    <Link href={`/dashboard/${meeting.id}`} transitionTypes={['nav-forward']} className="pressable flex gap-3 px-5 py-3">
       {meeting.thumbnailId ? (
-        <Thumbnail
-          publicId={meeting.thumbnailId}
-          alt=""
-          sizes="3rem"
-          ratio={[1, 1]}
-          className="w-10 shrink-0 rounded-md ring-1 ring-black/5 ring-inset"
-        />
+        // 상세 커버와 같은 이름: 상세로 가면 이 썸네일이 커버로 커짐
+        <ViewTransition name={`cover-${meeting.id}`} share="morph" default="none">
+          <Thumbnail
+            publicId={meeting.thumbnailId}
+            alt=""
+            sizes="6rem"
+            ratio={[3, 2]}
+            className="w-24 shrink-0 self-start rounded-md ring-1 ring-black/5 ring-inset"
+          />
+        </ViewTransition>
       ) : (
-        <span aria-hidden className="flex size-10 shrink-0 items-center justify-center rounded-md bg-gray-100 text-gray-400">
+        <span aria-hidden className="flex h-16 w-24 shrink-0 self-start items-center justify-center rounded-md bg-gray-100 text-gray-400">
           <CalendarDays className="size-4" strokeWidth={1.75} />
         </span>
       )}

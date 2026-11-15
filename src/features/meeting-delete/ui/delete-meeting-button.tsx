@@ -21,7 +21,7 @@ export function DeleteMeetingButton({ meetingId }: { meetingId: string }) {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button variant="destructive" className="w-full" disabled={pending}>
-          모임 삭제
+          {pending ? '삭제하는 중…' : '모임 삭제'}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>

@@ -115,4 +115,46 @@ test.describe('운영자', () => {
     expect(row.closed_at).toBeNull()
     expect(row.confirmed_option_id).toBeNull()
   })
+
+  test('기명 모임: 투표자 시트에서 투표 삭제', async ({ page }) => {
+    const id = `${PREFIX}rm1`
+    await seedMeeting({ id, votes: [['철수', [0, 1]], ['영희', [0]]] })
+    await page.goto(`/dashboard/${id}`)
+
+    await page.getByRole('button', { name: /1월 10일.*투표자 1명 보기/ }).click()
+    const sheet = page.getByRole('dialog')
+    await expect(sheet).toContainText('철수')
+    await sheet.getByRole('button', { name: '철수 투표 삭제' }).click()
+
+    const confirm = page.getByRole('alertdialog')
+    await expect(confirm).toContainText('철수님의 투표를 지울까요?')
+    await expect(confirm.getByRole('list', { name: '고른 날짜' }).getByRole('listitem')).toHaveText(['1월 9일(토)', '1월 10일(일)'])
+    await expect(confirm).toContainText('고른 날짜가 모두 지워지고 되돌릴 수 없어요.')
+    await confirm.getByRole('button', { name: '삭제' }).click()
+    await expect(page.getByText('투표를 지웠어요')).toBeVisible()
+
+    await expect(page.getByText('응답 1명')).toBeVisible()
+    // 시트가 열려 있으면 나머지 페이지가 aria-hidden이라 닫고 확인
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('dialog')).toHaveCount(0)
+    await expect(page.getByRole('button', { name: /1월 10일.*투표자/ })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: /1월 9일.*투표자 1명 보기/ })).toBeVisible()
+  })
+
+  test('익명 모임엔 투표자 삭제가 없음', async ({ page }) => {
+    const id = `${PREFIX}rm2`
+    await seedMeeting({ id, anonymous: true, votes: [['a', [0]]] })
+    await page.goto(`/dashboard/${id}`)
+    await expect(page.getByText('응답 1명')).toBeVisible()
+    await expect(page.getByRole('button', { name: /투표자 \d+명 보기/ })).toHaveCount(0)
+  })
+
+  test('마감된 모임 삭제 확인 창은 확정 변동을 알림', async ({ page }) => {
+    const id = `${PREFIX}rm3`
+    await seedMeeting({ id, closed: true, votes: [['철수', [0]]] })
+    await page.goto(`/dashboard/${id}`)
+    await page.getByRole('button', { name: /1월 9일.*투표자 1명 보기/ }).click()
+    await page.getByRole('dialog').getByRole('button', { name: '철수 투표 삭제' }).click()
+    await expect(page.getByRole('alertdialog')).toContainText('확정 날짜가 바뀔 수 있어요.')
+  })
 })

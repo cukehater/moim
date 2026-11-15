@@ -193,3 +193,143 @@
     }
   }
 }
+
+/* ── 모션 ── */
+
+/* 노션 커버 패럴랙스: 스크롤하면 사진이 절반 속도로 밀려 내려가며 옅어짐. 처음엔 살짝 확대된 채로 내려앉음 */
+@keyframes cover-settle {
+  from {
+    scale: 1.08;
+  }
+}
+@keyframes cover-drift {
+  to {
+    translate: 0 10rem;
+    opacity: 0.55;
+  }
+}
+@utility cover-parallax {
+  @media (prefers-reduced-motion: no-preference) {
+    & > img {
+      animation: cover-settle 1.2s var(--ease-out-expo) both;
+    }
+    @supports (animation-timeline: scroll()) {
+      & > img {
+        animation:
+          cover-settle 1.2s var(--ease-out-expo) both,
+          cover-drift linear both;
+        animation-timeline: auto, scroll(root);
+        animation-range: normal, 0 20rem;
+      }
+    }
+  }
+}
+
+/* 체크 표시를 손으로 긋듯: 짧은 획 → 긴 획 */
+@keyframes check-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+/* 선택 상자가 톡 눌렸다 돌아옴 */
+@keyframes check-pop {
+  40% {
+    scale: 0.82;
+  }
+}
+/* 득표 막대가 왼쪽부터 차오름 (width 전환과 겹치지 않게 scale로) */
+@keyframes bar-grow {
+  from {
+    scale: 0 1;
+  }
+}
+@utility bar-grow {
+  transform-origin: left;
+  animation: bar-grow 700ms var(--ease-out-expo) 150ms both;
+}
+
+/* 뷰 전환: 목록 썸네일 → 상세 커버 모핑. 비율이 달라 늘어나지 않게 cover로 */
+::view-transition {
+  pointer-events: none;
+}
+::view-transition-group(.morph) {
+  animation-duration: 420ms;
+  animation-timing-function: var(--ease-out-expo);
+}
+::view-transition-old(.morph),
+::view-transition-new(.morph) {
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 앞으로 가면 왼쪽으로, 뒤로 가면 오른쪽으로 밀림 */
+@keyframes vt-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes vt-slide {
+  from {
+    translate: var(--vt-offset) 0;
+  }
+}
+::view-transition-old(.nav-forward),
+::view-transition-old(.nav-back) {
+  animation:
+    150ms ease-in both reverse vt-fade,
+    300ms var(--ease-out-expo) both reverse vt-slide;
+}
+::view-transition-new(.nav-forward),
+::view-transition-new(.nav-back) {
+  animation:
+    220ms ease-out 90ms both vt-fade,
+    420ms var(--ease-out-expo) both vt-slide;
+}
+::view-transition-old(.nav-forward) {
+  --vt-offset: -2.5rem;
+}
+::view-transition-new(.nav-forward) {
+  --vt-offset: 2.5rem;
+}
+::view-transition-old(.nav-back) {
+  --vt-offset: 2.5rem;
+}
+::view-transition-new(.nav-back) {
+  --vt-offset: -2.5rem;
+}
+
+/* Suspense로 늦게 온 내용: 아래에서 떠오르며 초점이 맞음 */
+@keyframes vt-rise {
+  from {
+    opacity: 0;
+    translate: 0 0.75rem;
+    filter: blur(4px);
+  }
+}
+::view-transition-new(.reveal) {
+  animation: vt-rise 420ms var(--ease-out-expo) both;
+}
+
+/* 필터 알약: 고른 칸으로 미끄러져 감 */
+::view-transition-group(.pill) {
+  animation-duration: 320ms;
+  animation-timing-function: var(--ease-out-expo);
+}
+/* 지나가는 동안 옅어져 아래 글자가 비침 */
+@keyframes pill-ghost {
+  50% {
+    opacity: 0.35;
+  }
+}
+::view-transition-image-pair(.pill) {
+  animation: pill-ghost 320ms ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
