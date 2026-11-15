@@ -101,6 +101,7 @@ test.describe('운영자', () => {
     const id = `${PREFIX}reopen1`
     await seedMeeting({ id, votes: [['영희', [0]], ['민수', [1]]] })
     await page.goto(`/dashboard/${id}`)
+    await expect(page.getByRole('link', { name: '투표 페이지 열기' })).toHaveAttribute('href', `/m/${id}`)
 
     await page.getByRole('button', { name: '조기 마감' }).click()
     await expect(page.getByText('투표를 마감했어요')).toBeVisible()

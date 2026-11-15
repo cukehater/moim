@@ -1,10 +1,10 @@
 'use client'
 
 import { Check } from 'lucide-react'
-import { useState, useTransition } from 'react'
+import { useRef, useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { CancelVoteButton } from '@/features/vote-cancel'
-import { NameDialog, renameVoter, submitVote } from '@/features/vote-submit'
+import { AlreadyVotedDialog, NameDialog, renameVoter, submitVote, VoteSuccessDialog } from '@/features/vote-submit'
 import { Button } from '@/shared/ui/button'
 import { OptionCard, type VoteOption } from './option-card'
 
@@ -22,7 +22,14 @@ export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVo
   const [selected, setSelected] = useState(myVote?.optionIds ?? [])
   const [name, setName] = useState(myVote?.name ?? '')
   const [nameDialog, setNameDialog] = useState<{ pendingId?: string; error?: string } | null>(null)
+  const [success, setSuccess] = useState({ open: false, title: '', dates: [] as string[] })
   const [pending, startTransition] = useTransition()
+  const listRef = useRef<HTMLDivElement>(null)
+  // 페이지를 열 때 이미 투표한 사람만 (방금 투표해 생긴 myVote엔 안 띄움)
+  const [returning] = useState(!!myVote)
+
+  const dateLabels = (ids: string[]) =>
+    options.filter((o) => ids.includes(o.id)).map((o) => `${o.label}(${o.weekday})`)
 
   const apply = (id: string) =>
     setSelected((s) => (allowMultiple ? (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]) : [id]))
@@ -35,7 +42,7 @@ export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVo
   const submit = () =>
     startTransition(async () => {
       const r = await submitVote(meetingId, { optionIds: selected, name: isAnonymous ? undefined : name })
-      if (r.ok) return void toast.success(myVote ? '투표를 수정했어요' : '투표했어요')
+      if (r.ok) return setSuccess({ open: true, title: myVote ? '투표를 수정했어요' : '투표했어요', dates: dateLabels(selected) })
       const nameError = r.fieldErrors?.name?.[0]
       if (nameError) return setNameDialog({ error: nameError })
       toast.error(r.message ?? '투표하지 못했어요')
@@ -46,6 +53,7 @@ export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVo
   return (
     <>
       <div
+        ref={listRef}
         role={allowMultiple ? 'group' : 'radiogroup'}
         aria-label={allowMultiple ? '참석 가능한 날짜 (여러 개 선택 가능)' : '참석 가능한 날짜 (하나만 선택)'}
         className="flex flex-col divide-y divide-gray-200 overflow-hidden rounded-lg border border-gray-200"
@@ -86,6 +94,20 @@ export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVo
           </Button>
         )}
       </div>
+
+      <VoteSuccessDialog
+        {...success}
+        // 닫히는 애니메이션 동안 내용 유지
+        onOpenChange={(open) => setSuccess((s) => ({ ...s, open }))}
+      />
+
+      {returning && myVote && (
+        <AlreadyVotedDialog
+          name={myVote.name}
+          dates={dateLabels(myVote.optionIds)}
+          onEdit={() => listRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' })}
+        />
+      )}
 
       <NameDialog
         open={!!nameDialog}

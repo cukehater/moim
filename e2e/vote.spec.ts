@@ -16,9 +16,17 @@ test.describe('투표 페이지', () => {
     await page.getByRole('checkbox', { name: /1월 16일/ }).click()
 
     await page.getByRole('button', { name: '2개 날짜로 투표하기' }).click()
-    await expect(page.getByText('투표했어요')).toBeVisible()
+    const done = page.getByRole('dialog', { name: '투표했어요' })
+    await expect(done.getByText('1월 9일(토)')).toBeVisible()
+    await done.getByRole('button', { name: '확인' }).click()
+    await expect(page.getByRole('dialog')).toHaveCount(0)
 
+    // 다시 들어오면 이미 투표했다는 안내
     await page.reload()
+    const again = page.getByRole('dialog', { name: '테스터님은 이미 투표했어요' })
+    await expect(again.getByText('1월 16일(토)')).toBeVisible()
+    await again.getByRole('button', { name: '수정할래요' }).click()
+    await expect(page.getByRole('dialog')).toHaveCount(0)
     await expect(page.getByRole('checkbox', { name: /1월 9일/ })).toBeChecked()
     await expect(page.getByRole('checkbox', { name: /1월 16일/ })).toBeChecked()
     await expect(page.getByRole('button', { name: '수정하기' })).toBeDisabled()
@@ -30,6 +38,7 @@ test.describe('투표 페이지', () => {
     const seed = await seedMeeting({ id, votes: [['영희', [0]], ['민수', [1]]] })
     await context.addCookies([voterCookie(seed.voterToken(0))])
     await page.goto(`/m/${id}`)
+    await page.getByRole('button', { name: '그대로 둘게요' }).click()
 
     await page.getByRole('button', { name: '이름 변경' }).click()
     await page.getByRole('textbox', { name: '이름' }).fill('민수')
@@ -63,7 +72,7 @@ test.describe('투표 페이지', () => {
     await page.getByRole('checkbox', { name: /1월 10일/ }).click()
     await expect(page.getByRole('dialog')).toHaveCount(0)
     await page.getByRole('button', { name: '1개 날짜로 투표하기' }).click()
-    await expect(page.getByText('투표했어요')).toBeVisible()
+    await expect(page.getByRole('dialog', { name: '투표했어요' })).toBeVisible()
   })
 
   test('마감 + 단독 최다 득표면 자동 확정 안내', async ({ page }) => {

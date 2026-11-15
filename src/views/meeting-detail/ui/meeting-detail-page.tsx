@@ -1,3 +1,4 @@
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { type ReactNode, Suspense } from 'react'
@@ -100,7 +101,18 @@ async function MeetingDetail({ params }: Pick<PageProps<'/dashboard/[id]'>, 'par
 
         <div className="grid grid-cols-2 gap-2">
           <CopyLinkButton path={`/m/${id}`} />
-          <CloseReopenButton meetingId={id} isClosed={status === 'closed'} endsAtPassed={meeting.endsAt <= now} />
+          <Button asChild variant="secondary">
+            <Link href={`/m/${id}`}>
+              <ExternalLink aria-hidden />
+              투표 페이지 열기
+            </Link>
+          </Button>
+          <CloseReopenButton
+            meetingId={id}
+            isClosed={status === 'closed'}
+            endsAtPassed={meeting.endsAt <= now}
+            className="col-span-2"
+          />
         </div>
 
         <section>

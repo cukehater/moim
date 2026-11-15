@@ -1,3 +1,5 @@
 export { NameDialog } from './ui/name-dialog'
 export { submitVote } from './api/submit-vote.action'
 export { renameVoter } from './api/rename-voter.action'
+export { VoteSuccessDialog } from './ui/vote-success-dialog'
+export { AlreadyVotedDialog } from './ui/already-voted-dialog'
