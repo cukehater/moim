@@ -101,7 +101,7 @@ export function MeetingForm({ meetingId, defaultValues, hasVotes, status, nowInp
         <Controller control={control} name="thumbnailId" render={({ field }) => <>{renderThumbnail(field)}</>} />
       </section>
 
-      <Group label="기본 정보" boxed={false} errors={[err('title'), err('host'), err('location'), err('mapUrl'), err('description')]}>
+      <Group label="기본 정보" boxed={false} errors={[err('title'), err('host'), err('location'), err('naverMapUrl'), err('kakaoMapUrl'), err('description')]}>
         <div>
           <Input aria-label="제목" placeholder="제목 (필수)" maxLength={80} aria-invalid={!!err('title')} {...register('title')} />
         </div>
@@ -118,8 +118,19 @@ export function MeetingForm({ meetingId, defaultValues, hasVotes, status, nowInp
             aria-label="네이버 지도 링크"
             placeholder="네이버 지도 링크 (선택)"
             maxLength={300}
-            aria-invalid={!!err('mapUrl')}
-            {...register('mapUrl')}
+            aria-invalid={!!err('naverMapUrl')}
+            {...register('naverMapUrl')}
+          />
+        </div>
+        <div>
+          <Input
+            type="url"
+            inputMode="url"
+            aria-label="카카오맵 링크"
+            placeholder="카카오맵 링크 (선택)"
+            maxLength={300}
+            aria-invalid={!!err('kakaoMapUrl')}
+            {...register('kakaoMapUrl')}
           />
         </div>
         <div>

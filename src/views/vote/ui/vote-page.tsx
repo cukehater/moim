@@ -6,8 +6,9 @@ import { getMeeting } from '@/entities/meeting/index.server'
 import { getMyVote, getTallies } from '@/entities/vote/index.server'
 import { StatusOverlay } from '@/widgets/status-overlay'
 import { OptionList, VoteBoard, type VoteOption } from '@/widgets/vote-board'
-import { dayParts, formatDateTime, formatDday, formatRemaining, mapHref } from '@/shared/lib'
+import { dayParts, formatDateTime, formatDday, formatRemaining } from '@/shared/lib'
 import { DdayBadge } from '@/shared/ui/dday-badge'
+import { MapLink } from '@/shared/ui/map-link'
 import { PageHeader } from '@/shared/ui/page-header'
 import { getVoterToken } from '@/shared/lib/voter-token'
 import { Thumbnail } from '@/shared/ui/thumbnail'
@@ -70,7 +71,7 @@ async function Vote({ params }: Pick<PageProps<'/m/[id]'>, 'params'>) {
       )}
       <main className="pb-32">
         <div className="px-5 pt-5">
-          <h1 className="text-title font-semibold text-balance">{meeting.title}</h1>
+          <h1 className="text-display font-semibold text-balance">{meeting.title}</h1>
           {/* 노션 속성 목록 */}
           <dl className="mt-3 flex flex-col">
             <Property icon={UserRound} label="모임장">
@@ -78,15 +79,7 @@ async function Vote({ params }: Pick<PageProps<'/m/[id]'>, 'params'>) {
             </Property>
             {meeting.location && (
               <Property icon={MapPin} label="장소">
-                <a
-                  href={mapHref(meeting.location, meeting.mapUrl)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline decoration-gray-300 underline-offset-4 hover:decoration-gray-600"
-                >
-                  {meeting.location}
-                  <span className="sr-only"> (네이버 지도에서 열기)</span>
-                </a>
+                <MapLink location={meeting.location} naverMapUrl={meeting.naverMapUrl} kakaoMapUrl={meeting.kakaoMapUrl} />
               </Property>
             )}
             {/* 확정 안내를 닫은 뒤에도 답이 보이게 */}

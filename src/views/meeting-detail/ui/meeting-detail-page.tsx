@@ -9,10 +9,11 @@ import { CloseReopenButton } from '@/features/meeting-close-reopen'
 import { DeleteMeetingButton } from '@/features/meeting-delete'
 import { MeetingResultTable } from '@/widgets/meeting-result-table'
 import { requireAdmin } from '@/shared/auth'
-import { dayParts, formatDateTime, formatDday, mapHref } from '@/shared/lib'
+import { dayParts, formatDateTime, formatDday } from '@/shared/lib'
 import { DdayBadge } from '@/shared/ui/dday-badge'
 import { Button } from '@/shared/ui/button'
 import { CopyLinkButton } from '@/shared/ui/copy-link-button'
+import { MapLink } from '@/shared/ui/map-link'
 import { PageHeader } from '@/shared/ui/page-header'
 import { PageTransition } from '@/shared/ui/page-transition'
 import { Thumbnail } from '@/shared/ui/thumbnail'
@@ -81,7 +82,7 @@ async function MeetingDetail({ params }: Pick<PageProps<'/dashboard/[id]'>, 'par
       )}
       <main className="flex flex-col gap-6 px-5 pt-5 pb-16">
         <div>
-          <h2 className="text-title font-semibold text-balance">{meeting.title}</h2>
+          <h2 className="text-display font-semibold text-balance">{meeting.title}</h2>
           <dl className="mt-3 flex flex-col">
             <Property label="상태">
               <StatusBadge status={displayStatus} className="text-sub" />
@@ -97,14 +98,7 @@ async function MeetingDetail({ params }: Pick<PageProps<'/dashboard/[id]'>, 'par
             <Property label="모임장">{meeting.host}</Property>
             {meeting.location && (
               <Property label="장소">
-                <a
-                  href={mapHref(meeting.location, meeting.mapUrl)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline decoration-gray-300 underline-offset-4 hover:decoration-gray-600"
-                >
-                  {meeting.location}
-                </a>
+                <MapLink location={meeting.location} naverMapUrl={meeting.naverMapUrl} kakaoMapUrl={meeting.kakaoMapUrl} />
               </Property>
             )}
             <Property label="투표 기간">

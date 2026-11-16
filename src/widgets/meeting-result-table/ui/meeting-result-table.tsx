@@ -43,7 +43,7 @@ export function MeetingResultTable({ meetingId, options, tallies, confirmation, 
             {/* 투표 페이지 OptionCard와 같은 배치: 날짜(요일) · 막대 · 인원 · 투표자 칸 */}
             <div className="flex min-h-12 items-stretch">
               <div className="flex min-w-0 flex-1 items-center gap-3 pr-2 pl-3.5">
-                <span className="flex min-w-0 flex-1 items-center gap-1.5 text-body font-medium">
+                <span className="flex min-w-0 flex-1 items-center gap-1.5 text-heading font-semibold">
                   <span className="truncate">
                     {row.label}
                     <span
@@ -75,7 +75,8 @@ export function MeetingResultTable({ meetingId, options, tallies, confirmation, 
                 <span
                   className={cn(
                     'w-7 shrink-0 text-right text-sub font-medium tabular',
-                    row.count ? 'text-gray-700' : 'text-gray-400',
+                    // 최다 득표 줄은 막대와 같은 브랜드 블루 (투표 페이지와 같게)
+                    !row.count ? 'text-gray-400' : top ? 'font-semibold text-brand-600' : 'text-gray-700',
                   )}
                 >
                   {row.count}명

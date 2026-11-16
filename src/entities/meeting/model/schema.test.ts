@@ -6,7 +6,8 @@ const valid: MeetingInput = {
   host: '모임장',
   description: '',
   location: '',
-  mapUrl: '',
+  naverMapUrl: '',
+  kakaoMapUrl: '',
   thumbnailId: null,
   isAnonymous: false,
   allowMultiple: true,
@@ -29,15 +30,23 @@ describe('meetingInputSchema', () => {
     expect(meetingInputSchema.safeParse({ ...valid, dates: [] }).success).toBe(false)
     expect(meetingInputSchema.safeParse({ ...valid, dates: ['2026-12-20', '2026-12-20'] }).success).toBe(false)
   })
-  it('지도 링크는 네이버 https 링크만, 있으면 장소명 필수', () => {
-    const at = (mapUrl: string, location = '강남역') => meetingInputSchema.safeParse({ ...valid, location, mapUrl })
-    expect(at('https://naver.me/xYz12').success).toBe(true)
-    expect(at('https://map.naver.com/p/entry/place/123').success).toBe(true)
-    expect(at('http://naver.me/xYz12').success).toBe(false)
-    expect(at('https://evil.com/?naver.com').success).toBe(false)
-    expect(at('https://naver.com.evil.com').success).toBe(false)
-    expect(at('강남역').success).toBe(false)
-    expect(at('https://naver.me/xYz12', '').error?.issues[0].path).toEqual(['location'])
+  it('지도 링크는 네이버·카카오 https 링크만, 둘 다 넣거나 둘 다 비우고, 있으면 장소명 필수', () => {
+    const kakao = 'https://kko.to/aBc12'
+    const naver = 'https://naver.me/xYz12'
+    const at = (naverMapUrl: string, kakaoMapUrl: string, location = '강남역') =>
+      meetingInputSchema.safeParse({ ...valid, location, naverMapUrl, kakaoMapUrl })
+    expect(at(naver, kakao).success).toBe(true)
+    expect(at('https://map.naver.com/p/entry/place/123', 'https://place.map.kakao.com/123').success).toBe(true)
+    expect(at('', '').success).toBe(true)
+    expect(at('http://naver.me/xYz12', kakao).success).toBe(false)
+    expect(at('https://evil.com/?naver.com', kakao).success).toBe(false)
+    expect(at('https://naver.com.evil.com', kakao).success).toBe(false)
+    expect(at(naver, 'https://kakao.com.evil.com').success).toBe(false)
+    expect(at(naver, naver).success).toBe(false)
+    expect(at('강남역', kakao).success).toBe(false)
+    expect(at(naver, '').error?.issues[0].path).toEqual(['kakaoMapUrl'])
+    expect(at('', kakao).error?.issues[0].path).toEqual(['naverMapUrl'])
+    expect(at(naver, kakao, '').error?.issues[0].path).toEqual(['location'])
   })
   it('제목은 trim 후 1~80자', () => {
     expect(meetingInputSchema.safeParse({ ...valid, title: '   ' }).success).toBe(false)

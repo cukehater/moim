@@ -23,7 +23,7 @@ export function StatusOverlay({ title, highlight, badge, description, dismissibl
   return (
     <Dialog open={open} onOpenChange={(o) => dismissible && setOpen(o)}>
       <DialogContent
-        showCloseButton={dismissible}
+        showCloseButton={false}
         onEscapeKeyDown={block}
         onInteractOutside={block}
         className="max-w-[18.5rem] gap-0 px-5 pt-6 pb-6 text-center"

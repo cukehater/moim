@@ -1,0 +1,1 @@
+ALTER TABLE "meetings" ADD COLUMN "kakao_map_url" varchar(300);

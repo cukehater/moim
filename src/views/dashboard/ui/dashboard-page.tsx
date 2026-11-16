@@ -31,8 +31,8 @@ export function DashboardPage({ searchParams }: PageProps<'/dashboard'>) {
             <form action={signOutToLogin}>
               <Button
                 type="submit"
-                variant="secondary"
-                className="relative h-9 gap-1 px-3 text-gray-700 after:absolute after:-inset-y-1 after:inset-x-0"
+                variant="ghost"
+                className="relative h-9 gap-1 px-2.5 text-gray-600 after:absolute after:-inset-y-1 after:inset-x-0"
               >
                 <LogOut className="size-3.5" strokeWidth={2} aria-hidden />
                 로그아웃

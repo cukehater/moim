@@ -10,14 +10,14 @@ export function LoginPage({ searchParams }: PageProps<'/login'>) {
           {/* eslint-disable-next-line @next/next/no-img-element -- 정적 SVG 로고 */}
           <img src="/logo.svg" alt="MOIM" width={316} height={100} className="h-9 w-auto" />
         </h1>
-        <p className="text-sub text-gray-600">참석 여부, 한 번에 모아요</p>
+        <p className="text-body text-gray-600">참석 여부, 한 번에 모아요</p>
       </div>
       <div className="mt-auto flex flex-col gap-3">
         <Suspense>
           <LoginError searchParams={searchParams} />
         </Suspense>
         <form action={signInWithGoogle}>
-          <Button type="submit" size="lg" variant="secondary" className="w-full">
+          <Button type="submit" size="lg" variant="outline" className="w-full">
             <GoogleMark />
             Google로 계속하기
           </Button>

@@ -71,7 +71,7 @@ export function OptionCard({ option, selected = false, multiple = true, classNam
             )}
           </span>
         )}
-        <span className="min-w-0 flex-1 truncate text-body font-medium">
+        <span className="min-w-0 flex-1 truncate text-heading font-semibold">
           {option.label}
           <span
             className={cn(
@@ -100,7 +100,8 @@ export function OptionCard({ option, selected = false, multiple = true, classNam
           <span
             className={cn(
               'w-7 shrink-0 text-right text-sub font-medium tabular',
-              option.count ? 'text-gray-700' : 'text-gray-400',
+              // 최다 득표 줄은 막대와 같은 브랜드 블루
+              !option.count ? 'text-gray-400' : option.ratio === 1 ? 'font-semibold text-brand-600' : 'text-gray-700',
             )}
           >
             {option.count}명

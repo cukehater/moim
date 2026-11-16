@@ -61,7 +61,7 @@ export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVo
         ref={listRef}
         role={allowMultiple ? 'group' : 'radiogroup'}
         aria-label={allowMultiple ? '참석 가능한 날짜 (여러 개 선택 가능)' : '참석 가능한 날짜 (하나만 선택)'}
-        className="flex flex-col divide-y divide-gray-200 overflow-hidden rounded-lg border border-gray-200"
+        className="stagger-rise flex flex-col divide-y divide-gray-200 overflow-hidden rounded-lg border border-gray-200"
       >
         {options.map((o) => (
           <OptionCard
@@ -97,7 +97,7 @@ export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVo
           </>
         ) : (
           <Button size="lg" className="w-full" disabled={pending || selected.length === 0} onClick={submit}>
-            <Check strokeWidth={2.75} aria-hidden />
+            {selected.length > 0 && <Check strokeWidth={2.75} aria-hidden />}
             {pending ? '투표 중…' : !selected.length ? '날짜를 골라 주세요' : allowMultiple ? `${selected.length}개 날짜로 투표하기` : '이 날짜로 투표하기'}
           </Button>
         )}
