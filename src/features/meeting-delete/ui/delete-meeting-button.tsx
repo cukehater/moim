@@ -32,7 +32,7 @@ export function DeleteMeetingButton({ meetingId }: { meetingId: string }) {
         <AlertDialogFooter>
           <AlertDialogCancel>취소</AlertDialogCancel>
           <AlertDialogAction
-            className="text-destructive"
+            variant="destructive"
             onClick={() => startTransition(() => deleteMeeting(meetingId))}
           >
             삭제

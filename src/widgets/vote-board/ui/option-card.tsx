@@ -45,7 +45,7 @@ export function OptionCard({ option, selected = false, multiple = true, classNam
         aria-disabled={!interactive || undefined}
         tabIndex={interactive ? undefined : -1}
         className={cn(
-          'flex min-h-12 min-w-0 flex-1 items-center gap-3 pr-2 pl-3.5 text-left outline-offset-[-2px]',
+          'flex min-h-[max(44px,2.75rem)] min-w-0 flex-1 items-center gap-2.5 pr-2 pl-3 text-left outline-offset-[-2px]',
           className,
         )}
         {...props}
@@ -71,7 +71,7 @@ export function OptionCard({ option, selected = false, multiple = true, classNam
             )}
           </span>
         )}
-        <span className="min-w-0 flex-1 truncate text-heading font-semibold">
+        <span className="min-w-0 flex-1 truncate text-[0.9375rem] font-semibold">
           {option.label}
           <span
             className={cn(

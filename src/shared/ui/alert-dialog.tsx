@@ -36,7 +36,7 @@ function AlertDialogOverlay({
     <AlertDialogPrimitive.Overlay
       data-slot="alert-dialog-overlay"
       className={cn(
-        "fixed inset-0 z-50 bg-gray-900/50 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0",
+        "fixed inset-0 z-50 bg-gray-900/40 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0",
         className
       )}
       {...props}
@@ -58,7 +58,7 @@ function AlertDialogContent({
         data-slot="alert-dialog-content"
         data-size={size}
         className={cn(
-          "group/alert-dialog-content fixed top-[50%] left-[50%] z-50 grid w-full max-w-[18.5rem] translate-x-[-50%] translate-y-[-50%] gap-0 overflow-hidden rounded-2xl bg-white/95 p-0 backdrop-blur-xl duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
+          "group/alert-dialog-content fixed top-[50%] left-[50%] z-50 grid w-full max-w-[18.5rem] translate-x-[-50%] translate-y-[-50%] gap-0 rounded-xl bg-white px-5 pt-6 pb-5 shadow-pop outline-none duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
           className
         )}
         {...props}
@@ -75,7 +75,7 @@ function AlertDialogHeader({
     <div
       data-slot="alert-dialog-header"
       className={cn(
-        "flex flex-col items-center gap-1 px-4 pt-5 pb-4 text-center",
+        "flex flex-col items-center gap-1.5 text-center",
         className
       )}
       {...props}
@@ -91,7 +91,7 @@ function AlertDialogFooter({
     <div
       data-slot="alert-dialog-footer"
       className={cn(
-        "grid grid-cols-2 shadow-[inset_0_0.5px_0_var(--color-separator)] [&>*+*]:shadow-[inset_0.5px_0_0_var(--color-separator)]",
+        "mt-5 flex gap-2",
         className
       )}
       {...props}
@@ -107,7 +107,7 @@ function AlertDialogTitle({
     <AlertDialogPrimitive.Title
       data-slot="alert-dialog-title"
       className={cn(
-        "text-body font-semibold",
+        "text-heading font-semibold text-balance",
         className
       )}
       {...props}
@@ -122,7 +122,7 @@ function AlertDialogDescription({
   return (
     <AlertDialogPrimitive.Description
       data-slot="alert-dialog-description"
-      className={cn("text-caption text-gray-900", className)}
+      className={cn("text-sub text-gray-600", className)}
       {...props}
     />
   )
@@ -144,9 +144,10 @@ function AlertDialogMedia({
   )
 }
 
+// 모든 모달 공통: 기본 버튼 한 줄 (취소 회색 · 확인 잉크, 되돌릴 수 없는 일은 variant="destructive")
 function AlertDialogAction({
   className,
-  variant = "plain",
+  variant = "default",
   size = "default",
   ...props
 }: React.ComponentProps<typeof AlertDialogPrimitive.Action> &
@@ -155,7 +156,7 @@ function AlertDialogAction({
     <Button variant={variant} size={size} asChild>
       <AlertDialogPrimitive.Action
         data-slot="alert-dialog-action"
-        className={cn("h-11 font-semibold", className)}
+        className={cn("flex-1", className)}
         {...props}
       />
     </Button>
@@ -164,7 +165,7 @@ function AlertDialogAction({
 
 function AlertDialogCancel({
   className,
-  variant = "plain",
+  variant = "secondary",
   size = "default",
   ...props
 }: React.ComponentProps<typeof AlertDialogPrimitive.Cancel> &
@@ -173,7 +174,7 @@ function AlertDialogCancel({
     <Button variant={variant} size={size} asChild>
       <AlertDialogPrimitive.Cancel
         data-slot="alert-dialog-cancel"
-        className={cn("h-11", className)}
+        className={cn("flex-1", className)}
         {...props}
       />
     </Button>

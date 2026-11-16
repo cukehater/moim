@@ -88,7 +88,7 @@ async function DashboardContent({ searchParams }: Pick<PageProps<'/dashboard'>, 
 
   return (
     <>
-      <nav aria-label="상태 필터" className="flex gap-1 overflow-x-auto border-b border-gray-200 px-4 py-3">
+      <nav aria-label="상태 필터" className="flex gap-1 overflow-x-auto border-b border-gray-200 px-5 py-3">
         {FILTERS.map((f) => {
           const active = f === current
           return (

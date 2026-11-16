@@ -41,9 +41,9 @@ export function MeetingResultTable({ meetingId, options, tallies, confirmation, 
         return (
           <li key={row.id} className={cn('flex flex-col', confirmed && 'bg-brand-50')}>
             {/* 투표 페이지 OptionCard와 같은 배치: 날짜(요일) · 막대 · 인원 · 투표자 칸 */}
-            <div className="flex min-h-12 items-stretch">
-              <div className="flex min-w-0 flex-1 items-center gap-3 pr-2 pl-3.5">
-                <span className="flex min-w-0 flex-1 items-center gap-1.5 text-heading font-semibold">
+            <div className="flex min-h-[max(44px,2.75rem)] items-stretch">
+              <div className="flex min-w-0 flex-1 items-center gap-2.5 pr-2 pl-3">
+                <span className="flex min-w-0 flex-1 items-center gap-1.5 text-[0.9375rem] font-semibold">
                   <span className="truncate">
                     {row.label}
                     <span

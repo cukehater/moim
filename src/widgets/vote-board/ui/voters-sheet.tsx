@@ -41,7 +41,7 @@ export function VotersSheet({ dateLabel, voters }: Props) {
         }}
         className="top-auto bottom-0 max-h-[70dvh] max-w-[500px] translate-y-0 gap-3 overflow-y-auto rounded-b-none px-0 pt-5 pb-[calc(1rem+env(safe-area-inset-bottom))] data-[state=closed]:zoom-out-100 data-[state=closed]:slide-out-to-bottom data-[state=open]:zoom-in-100 data-[state=open]:slide-in-from-bottom"
       >
-        <DialogTitle className="px-5 text-body font-semibold">
+        <DialogTitle className="px-5">
           {dateLabel} <span className="font-normal text-gray-600 tabular">· {voters.length}명</span>
         </DialogTitle>
         <DialogDescription className="sr-only">이 날짜에 투표한 사람 목록</DialogDescription>

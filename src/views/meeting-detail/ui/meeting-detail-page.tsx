@@ -82,7 +82,7 @@ async function MeetingDetail({ params }: Pick<PageProps<'/dashboard/[id]'>, 'par
       )}
       <main className="flex flex-col gap-6 px-5 pt-5 pb-16">
         <div>
-          <h2 className="text-display font-semibold text-balance">{meeting.title}</h2>
+          <h2 className="text-title font-semibold text-balance">{meeting.title}</h2>
           <dl className="mt-3 flex flex-col">
             <Property label="상태">
               <StatusBadge status={displayStatus} className="text-sub" />
@@ -155,7 +155,10 @@ async function MeetingDetail({ params }: Pick<PageProps<'/dashboard/[id]'>, 'par
           )}
         </section>
 
-        <DeleteMeetingButton meetingId={id} />
+        {/* 되돌릴 수 없는 일은 결과와 떨어뜨려 맨 아래에 */}
+        <div className="mt-4">
+          <DeleteMeetingButton meetingId={id} />
+        </div>
       </main>
     </>
   )

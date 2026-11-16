@@ -46,7 +46,7 @@ export function RemoveVoteButton({ meetingId, voteId, name, dates, isClosed }: P
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>취소</AlertDialogCancel>
-          <AlertDialogAction className="text-destructive" onClick={remove}>
+          <AlertDialogAction variant="destructive" onClick={remove}>
             삭제
           </AlertDialogAction>
         </AlertDialogFooter>

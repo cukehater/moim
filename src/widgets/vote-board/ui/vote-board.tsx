@@ -53,6 +53,14 @@ export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVo
       toast.error(r.message ?? '투표하지 못했어요')
     })
 
+  const ctaLabel = pending
+    ? '투표 중…'
+    : !selected.length
+      ? '날짜를 골라 주세요'
+      : allowMultiple
+        ? `${selected.length}개 날짜로 투표하기`
+        : '이 날짜로 투표하기'
+
   const dirty = !myVote || !sameSet(selected, myVote.optionIds) || (!isAnonymous && name !== (myVote.name ?? ''))
 
   return (
@@ -75,7 +83,7 @@ export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVo
       </div>
 
       {!isAnonymous && name && (
-        <p className="mt-3 text-caption text-gray-600">
+        <p className="mt-3 text-caption text-gray-600 animate-in fade-in slide-in-from-top-1 duration-300 ease-out-expo">
           <b className="font-medium text-gray-900">{name}</b>님으로 투표해요 ·{' '}
           <button type="button" onClick={() => setNameDialog({})} className="py-2 font-medium text-brand underline-offset-2 hover:underline">
             이름 변경
@@ -97,8 +105,11 @@ export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVo
           </>
         ) : (
           <Button size="lg" className="w-full" disabled={pending || selected.length === 0} onClick={submit}>
-            {selected.length > 0 && <Check strokeWidth={2.75} aria-hidden />}
-            {pending ? '투표 중…' : !selected.length ? '날짜를 골라 주세요' : allowMultiple ? `${selected.length}개 날짜로 투표하기` : '이 날짜로 투표하기'}
+            {/* 고른 개수가 바뀔 때마다 문구가 아래에서 살짝 올라옴: 탭이 반영됐다는 확인 */}
+            <span key={ctaLabel} className="flex items-center gap-1.5 animate-in fade-in slide-in-from-bottom-1 duration-200 ease-out-expo">
+              {selected.length > 0 && <Check strokeWidth={2.75} aria-hidden />}
+              {ctaLabel}
+            </span>
           </Button>
         )}
       </div>

@@ -13,9 +13,9 @@ const buttonVariants = cva(
           "bg-gray-900 text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.14),inset_0_-2px_0_rgb(0_0_0/0.35),0_2px_6px_-1px_rgb(24_25_27/0.3)] hover:bg-gray-800 disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none disabled:opacity-100",
         brand: "bg-brand text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.18),inset_0_-2px_0_rgb(0_0_40/0.25)] hover:bg-brand-600",
         // 상태 버튼: 원색 대신 그 색을 옅게 채운 면 + 진한 같은 색 글자 (눈부시지 않게)
-        // 되돌릴 수 없는 일 (모임 삭제): 회색 면에 빨간 글자, 가장 조용하게
+        // 되돌릴 수 없는 일 (삭제·투표 취소): 빨간 면에 흰 글자. 흰 글자 대비 4.5:1 이상이 되게 빨강을 조금 어둡게
         destructive:
-          "bg-gray-100 text-[color-mix(in_oklab,var(--color-destructive),black_20%)] hover:bg-[color-mix(in_oklab,var(--color-gray-100),var(--color-destructive)_8%)]",
+          "bg-[color-mix(in_oklab,var(--color-destructive),black_7%)] text-white hover:bg-[color-mix(in_oklab,var(--color-destructive),black_16%)]",
         // 진행 중인 것을 멈춤 (조기 마감): 약속 주황
         caution:
           "bg-[color-mix(in_oklab,var(--color-promise-50),var(--color-promise)_6%)] text-[color-mix(in_oklab,var(--color-promise-ink),black_18%)] shadow-[inset_0_0_0_1px_rgb(255_107_74/0.16)] hover:bg-[color-mix(in_oklab,var(--color-promise-50),var(--color-promise)_14%)]",

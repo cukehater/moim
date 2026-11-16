@@ -3,7 +3,7 @@
 import { cn } from '@/shared/lib/cn'
 import { mapHrefs } from '@/shared/lib/map'
 import { Button } from '@/shared/ui/button'
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/shared/ui/dialog'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/shared/ui/dialog'
 
 type Props = {
   location: string
@@ -26,10 +26,12 @@ export function MapLink({ location, naverMapUrl, kakaoMapUrl }: Props) {
       <DialogTrigger className="rounded-sm text-left underline decoration-gray-300 underline-offset-4 outline-none hover:decoration-gray-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">
         {location}
       </DialogTrigger>
-      <DialogContent showCloseButton={false} aria-describedby={undefined} className="max-w-[18.5rem] gap-0 px-5 pt-6 pb-6 text-center">
-        <DialogTitle className="text-heading font-semibold text-balance">어떤 앱으로 장소를 볼까요?</DialogTitle>
+      <DialogContent aria-describedby={undefined}>
+        <DialogHeader>
+          <DialogTitle>어떤 앱으로 장소를 볼까요?</DialogTitle>
+        </DialogHeader>
         {/* 두 버튼 폭은 긴 쪽(네이버 지도)에 맞춰 같게 */}
-        <div className="mx-auto mt-4 grid w-fit grid-cols-2 gap-2">
+        <DialogFooter className="mx-auto grid w-fit grid-cols-2">
           {APPS.map((app) => (
             // 보이는 높이 36px, 누르는 영역은 위아래로 넓혀 44px
             <Button
@@ -45,7 +47,7 @@ export function MapLink({ location, naverMapUrl, kakaoMapUrl }: Props) {
               </a>
             </Button>
           ))}
-        </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

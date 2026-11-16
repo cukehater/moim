@@ -71,7 +71,7 @@ async function Vote({ params }: Pick<PageProps<'/m/[id]'>, 'params'>) {
       )}
       <main className="pb-32">
         <div className="px-5 pt-5">
-          <h1 className="text-display font-semibold text-balance">{meeting.title}</h1>
+          <h1 className="text-title font-semibold text-balance">{meeting.title}</h1>
           {/* 노션 속성 목록 */}
           <dl className="mt-3 flex flex-col">
             <Property icon={UserRound} label="모임장">

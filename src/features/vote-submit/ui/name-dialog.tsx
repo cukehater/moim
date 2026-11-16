@@ -25,7 +25,7 @@ type Props = {
 export function NameDialog({ open, onOpenChange, defaultName, serverError, onConfirm }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[18.5rem]">
+      <DialogContent>
         {/* 열 때마다 입력값·에러 초기화 */}
         {open && <NameForm defaultName={defaultName} serverError={serverError} onConfirm={onConfirm} />}
       </DialogContent>
@@ -40,7 +40,7 @@ function NameForm({ defaultName, serverError, onConfirm }: Omit<Props, 'open' | 
   return (
     <form
       noValidate
-      className="flex flex-col gap-4"
+      className="flex flex-col"
       onSubmit={(e) => {
         e.preventDefault()
         // voterNameSchema와 같은 규칙. 투표 페이지 번들에서 zod를 빼려고 직접 검사 (서버에서 zod로 재검증)
@@ -57,7 +57,7 @@ function NameForm({ defaultName, serverError, onConfirm }: Omit<Props, 'open' | 
         <DialogTitle>이름을 알려주세요</DialogTitle>
         <DialogDescription>다른 참여자에게 이 이름으로 보여요.</DialogDescription>
       </DialogHeader>
-      <div className="flex flex-col gap-2">
+      <div className="mt-4 flex flex-col gap-2">
         <Input
           autoFocus
           className="text-input-safe"
@@ -75,7 +75,7 @@ function NameForm({ defaultName, serverError, onConfirm }: Omit<Props, 'open' | 
         <FieldError id="voter-name-error" message={error} />
       </div>
       <DialogFooter>
-        <Button type="submit" size="lg" className="w-full" disabled={pending}>
+        <Button type="submit" className="w-full" disabled={pending}>
           {pending ? '저장 중…' : '확인'}
         </Button>
       </DialogFooter>

@@ -84,13 +84,13 @@ export function CloseReopenButton({ meetingId, isClosed, endsAtPassed, className
           </DialogHeader>
           {/* min-w-0: 모달이 grid라 iOS 날짜 입력의 고유 폭만큼 칸이 넓어져 모달 밖으로 밀리는 것 방지 */}
           <form
-            className="flex min-w-0 flex-col gap-2"
+            className="mt-4 flex min-w-0 flex-col gap-2"
             onSubmit={(e) => {
               e.preventDefault()
               reopen()
             }}
           >
-            <Label htmlFor="reopen-ends-at">새 종료 시각</Label>
+            <Label htmlFor="reopen-ends-at" className="sr-only">새 종료 시각</Label>
             <div className="relative">
               <Input
                 id="reopen-ends-at"
@@ -122,8 +122,8 @@ export function CloseReopenButton({ meetingId, isClosed, endsAtPassed, className
               )}
             </div>
             <FieldError message={error} />
-            <DialogFooter className="mt-2">
-              <Button type="submit" disabled={pending || !endsAt}>
+            <DialogFooter className="mt-3">
+              <Button type="submit" className="w-full" disabled={pending || !endsAt}>
                 {pending ? '여는 중…' : '재개하기'}
               </Button>
             </DialogFooter>

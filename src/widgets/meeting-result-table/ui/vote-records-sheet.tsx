@@ -44,7 +44,7 @@ export function VoteRecordsSheet({ meetingId, dateLabel, rows, isClosed }: Props
         }}
         className="top-auto bottom-0 max-h-[70dvh] max-w-[500px] translate-y-0 gap-3 overflow-y-auto [scrollbar-gutter:stable] rounded-b-none px-0 pt-5 pb-[calc(1rem+env(safe-area-inset-bottom))] data-[state=closed]:zoom-out-100 data-[state=closed]:slide-out-to-bottom data-[state=open]:zoom-in-100 data-[state=open]:slide-in-from-bottom"
       >
-        <DialogTitle className="px-5 text-body font-semibold">
+        <DialogTitle className="px-5">
           {dateLabel} <span className="font-normal text-gray-600 tabular">· {rows.length}명</span>
         </DialogTitle>
         <DialogDescription className="sr-only">이 날짜에 투표한 사람과 그 사람이 고른 날짜. 중복 투표를 지울 수 있어요</DialogDescription>

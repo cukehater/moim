@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/shared/ui/button'
 import { DdayBadge } from '@/shared/ui/dday-badge'
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/shared/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/shared/ui/dialog'
 
 type Props = {
   title: string
@@ -22,24 +22,28 @@ export function StatusOverlay({ title, highlight, badge, description, dismissibl
   const block = (e: Event) => !dismissible && e.preventDefault()
   return (
     <Dialog open={open} onOpenChange={(o) => dismissible && setOpen(o)}>
-      <DialogContent
-        showCloseButton={false}
-        onEscapeKeyDown={block}
-        onInteractOutside={block}
-        className="max-w-[18.5rem] gap-0 px-5 pt-6 pb-6 text-center"
-      >
-        <DialogTitle className="text-sub font-medium text-balance text-gray-600">{title}</DialogTitle>
-        {badge && <DdayBadge className="mx-auto mt-3">{badge}</DdayBadge>}
-        {highlight && <p className="mt-1.5 text-title font-semibold text-gray-900">{highlight}</p>}
-        {description ? (
-          <DialogDescription className="mt-1.5 text-sub text-gray-600">{description}</DialogDescription>
-        ) : (
-          <DialogDescription className="sr-only">{title}</DialogDescription>
+      <DialogContent onEscapeKeyDown={block} onInteractOutside={block}>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          {description ? (
+            <DialogDescription>{description}</DialogDescription>
+          ) : (
+            <DialogDescription className="sr-only">{title}</DialogDescription>
+          )}
+        </DialogHeader>
+        {/* 확정 날짜·시작 시각은 제목 아래 본문으로 크게 */}
+        {(badge || highlight) && (
+          <div className="mt-4 flex flex-col items-center gap-1.5 rounded-lg bg-gray-50 py-3.5">
+            {badge && <DdayBadge>{badge}</DdayBadge>}
+            {highlight && <p className="text-title font-semibold text-gray-900">{highlight}</p>}
+          </div>
         )}
         {dismissible && (
-          <Button size="lg" className="mt-5 w-full" onClick={() => setOpen(false)}>
-            확인
-          </Button>
+          <DialogFooter>
+            <Button className="w-full" onClick={() => setOpen(false)}>
+              확인
+            </Button>
+          </DialogFooter>
         )}
       </DialogContent>
     </Dialog>

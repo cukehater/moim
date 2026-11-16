@@ -50,7 +50,7 @@ function DialogOverlay({
 function DialogContent({
   className,
   children,
-  showCloseButton = true,
+  showCloseButton = false,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
@@ -61,7 +61,7 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          "fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(min(100%,500px)-2.5rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-xl bg-white p-5 shadow-pop duration-200 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
+          "fixed top-[50%] left-[50%] z-50 grid w-full max-w-[18.5rem] translate-x-[-50%] translate-y-[-50%] gap-0 rounded-xl bg-white px-5 pt-6 pb-5 shadow-pop duration-200 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
           className
         )}
         {...props}
@@ -85,7 +85,7 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="dialog-header"
-      className={cn("flex flex-col gap-2 text-left", className)}
+      className={cn("flex flex-col items-center gap-1.5 text-center", className)}
       {...props}
     />
   )
@@ -103,7 +103,7 @@ function DialogFooter({
     <div
       data-slot="dialog-footer"
       className={cn(
-        "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
+        "mt-5 flex gap-2",
         className
       )}
       {...props}
@@ -125,7 +125,7 @@ function DialogTitle({
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn("text-body font-semibold", className)}
+      className={cn("text-heading font-semibold text-balance", className)}
       {...props}
     />
   )
