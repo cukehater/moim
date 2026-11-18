@@ -58,7 +58,7 @@ function AlertDialogContent({
         data-slot="alert-dialog-content"
         data-size={size}
         className={cn(
-          "group/alert-dialog-content fixed top-[50%] left-[50%] z-50 grid w-full max-w-[18.5rem] translate-x-[-50%] translate-y-[-50%] gap-0 rounded-xl bg-white px-5 pt-6 pb-5 shadow-pop outline-none duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
+          "group/alert-dialog-content fixed top-[50%] left-[50%] z-50 grid w-full max-w-[20.5rem] translate-x-[-50%] translate-y-[-50%] gap-0 rounded-xl bg-white px-5 pt-6 pb-5 shadow-pop outline-none duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
           className
         )}
         {...props}
@@ -122,7 +122,7 @@ function AlertDialogDescription({
   return (
     <AlertDialogPrimitive.Description
       data-slot="alert-dialog-description"
-      className={cn("text-sub text-gray-600", className)}
+      className={cn("text-sub text-balance text-gray-600", className)}
       {...props}
     />
   )

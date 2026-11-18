@@ -5,19 +5,19 @@
   /* 숫자만 Open Sans (unicode-range 0~9), 나머지는 Pretendard */
   --font-sans: var(--font-digits), var(--font-pretendard), system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
 
-  /* 타입 스케일 (390px 기준 px): 22 / 16 / 14 / 13 / 12. 촘촘한 노션·리니어 본문, 굵기는 500·600 */
-  --text-title: 1.375rem;
+  /* 타입 스케일 (390px 기준 px): 24 / 17 / 15 / 14 / 13. 촘촘한 노션·리니어 본문, 굵기는 500·600 */
+  --text-title: 1.5rem;
   --text-title--line-height: 1.3;
   --text-title--letter-spacing: -0.028em;
-  --text-heading: 1rem;
+  --text-heading: 1.0625rem;
   --text-heading--line-height: 1.4;
   --text-heading--letter-spacing: -0.015em;
-  --text-body: 0.875rem;
+  --text-body: 0.9375rem;
   --text-body--line-height: 1.5;
   --text-body--letter-spacing: -0.008em;
-  --text-sub: 0.8125rem;
+  --text-sub: 0.875rem;
   --text-sub--line-height: 1.45;
-  --text-caption: 0.75rem;
+  --text-caption: 0.8125rem;
   --text-caption--line-height: 1.4;
 
   /* 터치 타깃: 390px 기준 48px, rem 축소와 무관하게 최소 44px */

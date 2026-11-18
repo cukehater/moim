@@ -5,7 +5,9 @@ import { useRef, useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { CancelVoteButton } from '@/features/vote-cancel'
 import { AlreadyVotedDialog, NameDialog, renameVoter, submitVote, VoteSuccessDialog } from '@/features/vote-submit'
+import { cn } from '@/shared/lib/cn'
 import { Button } from '@/shared/ui/button'
+import { Switch } from '@/shared/ui/switch'
 import { OptionCard, type VoteOption } from './option-card'
 
 type Props = {
@@ -23,7 +25,7 @@ export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVo
   // 갱신으로 사라진 후보 날짜는 선택에서 제외 (숨은 id가 남아 제출이 계속 거부되지 않게)
   const selected = picked.filter((id) => options.some((o) => o.id === id))
   const [name, setName] = useState(myVote?.name ?? '')
-  const [nameDialog, setNameDialog] = useState<{ pendingId?: string; error?: string } | null>(null)
+  const [nameDialog, setNameDialog] = useState<{ onNamed?: () => void; error?: string } | null>(null)
   const [success, setSuccess] = useState({ open: false, title: '', dates: [] as string[] })
   const [pending, startTransition] = useTransition()
   const listRef = useRef<HTMLDivElement>(null)
@@ -37,8 +39,15 @@ export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVo
     setSelected((s) => (allowMultiple ? (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]) : [id]))
 
   const onTap = (id: string) => {
-    if (!isAnonymous && !name) return setNameDialog({ pendingId: id })
+    if (!isAnonymous && !name) return setNameDialog({ onNamed: () => apply(id) })
     apply(id)
+  }
+
+  const allSelected = selected.length === options.length
+  const toggleAll = () => setSelected(allSelected ? [] : options.map((o) => o.id))
+  const onTapAll = () => {
+    if (!isAnonymous && !name) return setNameDialog({ onNamed: toggleAll })
+    toggleAll()
   }
 
   const submit = () =>
@@ -71,6 +80,18 @@ export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVo
         aria-label={allowMultiple ? '참석 가능한 날짜 (여러 개 선택 가능)' : '참석 가능한 날짜 (하나만 선택)'}
         className="stagger-rise flex flex-col divide-y divide-gray-200 overflow-hidden rounded-lg border border-gray-200"
       >
+        {allowMultiple && options.length > 1 && (
+          // 목록 머리 줄: 날짜(체크박스)와 구분되게 회색 면 + 스위치. 줄 전체가 label이라 문구를 눌러도 토글
+          <label
+            className={cn(
+              'flex min-h-[max(44px,2.75rem)] cursor-pointer items-center justify-between gap-3 bg-gray-50 pr-3 pl-3 text-sub font-semibold transition-colors duration-200',
+              allSelected ? 'text-brand-600' : 'text-gray-700',
+            )}
+          >
+            모든 날짜 참석 가능해요
+            <Switch checked={allSelected} onCheckedChange={onTapAll} />
+          </label>
+        )}
         {options.map((o) => (
           <OptionCard
             key={o.id}
@@ -141,7 +162,7 @@ export function VoteBoard({ meetingId, options, allowMultiple, isAnonymous, myVo
             toast.success('이름을 바꿨어요')
           }
           setName(n)
-          if (nameDialog?.pendingId) apply(nameDialog.pendingId)
+          nameDialog?.onNamed?.()
           setNameDialog(null)
         }}
       />

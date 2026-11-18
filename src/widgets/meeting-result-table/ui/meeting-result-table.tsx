@@ -43,7 +43,7 @@ export function MeetingResultTable({ meetingId, options, tallies, confirmation, 
             {/* 투표 페이지 OptionCard와 같은 배치: 날짜(요일) · 막대 · 인원 · 투표자 칸 */}
             <div className="flex min-h-[max(44px,2.75rem)] items-stretch">
               <div className="flex min-w-0 flex-1 items-center gap-2.5 pr-2 pl-3">
-                <span className="flex min-w-0 flex-1 items-center gap-1.5 text-[0.9375rem] font-semibold">
+                <span className="flex min-w-0 flex-1 items-center gap-1.5 text-base font-semibold">
                   <span className="truncate">
                     {row.label}
                     <span

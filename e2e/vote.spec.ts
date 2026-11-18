@@ -33,6 +33,26 @@ test.describe('투표 페이지', () => {
     await expect(page.getByText('테스터님으로 투표해요')).toBeVisible()
   })
 
+  test('모든 날짜 참석 가능: 이름 입력 후 전체 선택, 하나 빼면 전체 체크 해제', async ({ page }) => {
+    const id = `${PREFIX}vote11`
+    await seedMeeting({ id })
+    await page.goto(`/m/${id}`)
+
+    const all = page.getByRole('switch', { name: '모든 날짜 참석 가능해요' })
+    const dates = page.getByRole('group', { name: /참석 가능한 날짜/ }).getByRole('checkbox')
+    await all.click()
+    await page.getByRole('textbox', { name: '이름' }).fill('테스터')
+    await page.getByRole('button', { name: '확인' }).click()
+    await expect(all).toBeChecked()
+    for (const d of await dates.all()) await expect(d).toBeChecked()
+
+    await dates.first().click()
+    await expect(all).not.toBeChecked()
+    await all.click()
+    await page.getByRole('button', { name: /개 날짜로 투표하기/ }).click()
+    await expect(page.getByRole('dialog')).toContainText('투표했어요')
+  })
+
   test('이미 있는 이름은 막고, 투표한 사람의 이름 변경은 바로 저장', async ({ page, context }) => {
     const id = `${PREFIX}vote2`
     const seed = await seedMeeting({ id, votes: [['영희', [0]], ['민수', [1]]] })
@@ -106,7 +126,7 @@ test.describe('투표 페이지', () => {
     const id = `${PREFIX}vote9`
     await seedMeeting({ id, anonymous: true })
     await page.goto(`/m/${id}`)
-    await page.getByRole('checkbox').first().click()
+    await page.getByRole('group', { name: /참석 가능한 날짜/ }).getByRole('checkbox').first().click()
     await page.getByRole('button', { name: /투표하기/ }).click()
     await page.getByRole('dialog').getByRole('button', { name: '확인' }).click()
 
@@ -117,7 +137,7 @@ test.describe('투표 페이지', () => {
     await page.getByRole('alertdialog').getByRole('button', { name: '투표 취소' }).click()
     await expect(page.getByRole('button', { name: '날짜를 골라 주세요' })).toBeVisible()
 
-    await page.getByRole('checkbox').first().click()
+    await page.getByRole('group', { name: /참석 가능한 날짜/ }).getByRole('checkbox').first().click()
     await page.getByRole('button', { name: /투표하기/ }).click()
     await expect(page.getByRole('dialog')).toContainText('투표했어요')
     // 투표 후 서버 갱신(revalidate)이 도착한 뒤에도 안내가 새로 뜨지 않아야 함
@@ -131,12 +151,12 @@ test.describe('투표 페이지', () => {
     const id = `${PREFIX}vote10`
     const { optionId } = await seedMeeting({ id, anonymous: true })
     await page.goto(`/m/${id}`)
-    await page.getByRole('checkbox').nth(0).click()
-    await page.getByRole('checkbox').nth(1).click()
+    await page.getByRole('group', { name: /참석 가능한 날짜/ }).getByRole('checkbox').nth(0).click()
+    await page.getByRole('group', { name: /참석 가능한 날짜/ }).getByRole('checkbox').nth(1).click()
     await deleteOption(optionId(1))
     await page.getByRole('button', { name: /투표하기/ }).click()
     // 첫 제출은 서버가 거부하지만 화면이 갱신돼 지워진 날짜가 사라지고, 남은 선택으로 다시 투표 가능
-    await expect(page.getByRole('checkbox')).toHaveCount(2)
+    await expect(page.getByRole('group', { name: /참석 가능한 날짜/ }).getByRole('checkbox')).toHaveCount(2)
     await page.getByRole('button', { name: /투표하기/ }).click()
     await expect(page.getByRole('dialog')).toContainText('투표했어요')
   })

@@ -7,9 +7,10 @@ import { VoterAvatar, VoterChip } from '@/shared/ui/voter-chip'
 
 type Props = { dateLabel: string; voters: Voter[] }
 
-const FACE_LIMIT = 3
-/** 아바타 4개(3 + '+N') 폭. 투표자 없는 줄의 빈칸도 같은 폭 */
-export const VOTER_SLOT = 'w-[4.875rem]'
+// 날짜 칸 폭 확보: 얼굴 2개 + '+N'까지만
+const FACE_LIMIT = 2
+/** 아바타 3개(2 + '+N') 폭. 투표자 없는 줄의 빈칸도 같은 폭 */
+export const VOTER_SLOT = 'w-[3.75rem]'
 
 /** 아바타 묶음을 누르면 바텀 시트로 투표자 목록 (모바일엔 hover 툴팁이 없음) */
 export function VotersSheet({ dateLabel, voters }: Props) {

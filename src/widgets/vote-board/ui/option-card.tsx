@@ -71,7 +71,7 @@ export function OptionCard({ option, selected = false, multiple = true, classNam
             )}
           </span>
         )}
-        <span className="min-w-0 flex-1 truncate text-[0.9375rem] font-semibold">
+        <span className="min-w-0 flex-1 truncate text-base font-semibold">
           {option.label}
           <span
             className={cn(
@@ -85,7 +85,7 @@ export function OptionCard({ option, selected = false, multiple = true, classNam
         {option.ratio !== undefined && (
           <span
             aria-hidden
-            className={cn('h-1 w-12 shrink-0 overflow-hidden rounded-full bg-gray-200', !option.count && 'invisible')}
+            className={cn('h-1 w-10 shrink-0 overflow-hidden rounded-full bg-gray-200', !option.count && 'invisible')}
           >
             <span
               className={cn(

@@ -26,7 +26,7 @@ export function PageHeader({ title, backHref, action, heading = true }: Props) {
           href={backHref}
           transitionTypes={['nav-back']}
           aria-label="목록으로"
-          className="flex size-tap shrink-0 items-center justify-center rounded-md text-gray-600 hover:bg-gray-100 active:bg-gray-100"
+          className="flex size-tap shrink-0 items-center justify-center rounded-md text-gray-600 active:bg-gray-100"
         >
           <ChevronLeft className="size-5.5" strokeWidth={2} aria-hidden />
         </Link>

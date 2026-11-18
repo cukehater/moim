@@ -17,6 +17,8 @@ type Seed = {
   votes?: [string, number[]][]
   dates?: string[]
   description?: string
+  /** 확정할 후보 인덱스 */
+  confirmed?: number
   startsAt?: Date
   endsAt?: Date
 }
@@ -30,6 +32,7 @@ export async function seedMeeting({
   votes = [],
   dates = ['2027-01-09', '2027-01-10', '2027-01-16'],
   description,
+  confirmed,
   startsAt,
   endsAt,
 }: Seed) {
@@ -47,6 +50,7 @@ export async function seedMeeting({
       values (${voteId}, ${id}, ${`${id}-tok${k}`}, ${anonymous ? null : name}, ${new Date(now - 60_000 + k * 1000)})`
     for (const p of picks) await sql`insert into vote_selections (vote_id, option_id) values (${voteId}, ${`${id}o${p}`})`
   }
+  if (confirmed !== undefined) await sql`update meetings set confirmed_option_id = ${`${id}o${confirmed}`} where id = ${id}`
   return { optionId: (i: number) => `${id}o${i}`, voterToken: (k: number) => `${id}-tok${k}` }
 }
 
